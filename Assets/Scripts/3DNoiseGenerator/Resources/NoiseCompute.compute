@@ -1,0 +1,240 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#define vec2 float2
+#define vec3 float3
+#define vec4 float4
+#define mix lerp
+#define fract frac
+#define time _Time.y*0.5
+
+#define noise simplex3D
+
+RWStructuredBuffer<float4> pixelBuffer;
+int pixelBufferSize;
+int textureSize;
+float scale;
+
+Texture2D _NoiseTex;
+SamplerState sampler_NoiseTex
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+float4 _NoiseTex_TexelSize;
+
+
+
+float noise3D(vec3 p)
+{
+    return fract(sin(dot(p, vec3(12.9898, 78.233, 128.852))) * 43758.5453) * 2.0 - 1.0;
+}
+
+float simplex3D(vec3 p)
+{
+	
+    float f3 = 1.0 / 3.0;
+    float s = (p.x + p.y + p.z) * f3;
+    int i = int(floor(p.x + s));
+    int j = int(floor(p.y + s));
+    int k = int(floor(p.z + s));
+	
+    float g3 = 1.0 / 6.0;
+    float t = float((i + j + k)) * g3;
+    float x0 = float(i) - t;
+    float y0 = float(j) - t;
+    float z0 = float(k) - t;
+    x0 = p.x - x0;
+    y0 = p.y - y0;
+    z0 = p.z - z0;
+	
+    int i1, j1, k1;
+    int i2, j2, k2;
+	
+    if (x0 >= y0)
+    {
+        if (y0 >= z0)
+        {
+            i1 = 1;
+            j1 = 0;
+            k1 = 0;
+            i2 = 1;
+            j2 = 1;
+            k2 = 0;
+        } // X Y Z order
+        else if (x0 >= z0)
+        {
+            i1 = 1;
+            j1 = 0;
+            k1 = 0;
+            i2 = 1;
+            j2 = 0;
+            k2 = 1;
+        } // X Z Y order
+        else
+        {
+            i1 = 0;
+            j1 = 0;
+            k1 = 1;
+            i2 = 1;
+            j2 = 0;
+            k2 = 1;
+        } // Z X Z order
+    }
+    else
+    {
+        if (y0 < z0)
+        {
+            i1 = 0;
+            j1 = 0;
+            k1 = 1;
+            i2 = 0;
+            j2 = 1;
+            k2 = 1;
+        } // Z Y X order
+        else if (x0 < z0)
+        {
+            i1 = 0;
+            j1 = 1;
+            k1 = 0;
+            i2 = 0;
+            j2 = 1;
+            k2 = 1;
+        } // Y Z X order
+        else
+        {
+            i1 = 0;
+            j1 = 1;
+            k1 = 0;
+            i2 = 1;
+            j2 = 1;
+            k2 = 0;
+        } // Y X Z order
+    }
+	
+    float x1 = x0 - float(i1) + g3;
+    float y1 = y0 - float(j1) + g3;
+    float z1 = z0 - float(k1) + g3;
+    float x2 = x0 - float(i2) + 2.0 * g3;
+    float y2 = y0 - float(j2) + 2.0 * g3;
+    float z2 = z0 - float(k2) + 2.0 * g3;
+    float x3 = x0 - 1.0 + 3.0 * g3;
+    float y3 = y0 - 1.0 + 3.0 * g3;
+    float z3 = z0 - 1.0 + 3.0 * g3;
+				 
+	vec3 ijk0 = vec3(i, j, k);
+	vec3 ijk1 = vec3(i + i1, j + j1, k + k1);
+	vec3 ijk2 = vec3(i + i2, j + j2, k + k2);
+	vec3 ijk3 = vec3(i + 1, j + 1, k + 1);
+            
+	vec3 gr0 = normalize(vec3(noise3D(ijk0), noise3D(ijk0 * 2.01), noise3D(ijk0 * 2.02)));
+	vec3 gr1 = normalize(vec3(noise3D(ijk1), noise3D(ijk1 * 2.01), noise3D(ijk1 * 2.02)));
+	vec3 gr2 = normalize(vec3(noise3D(ijk2), noise3D(ijk2 * 2.01), noise3D(ijk2 * 2.02)));
+	vec3 gr3 = normalize(vec3(noise3D(ijk3), noise3D(ijk3 * 2.01), noise3D(ijk3 * 2.02)));
+	
+    float n0 = 0.0;
+    float n1 = 0.0;
+    float n2 = 0.0;
+    float n3 = 0.0;
+
+    float t0 = 0.5 - x0 * x0 - y0 * y0 - z0 * z0;
+    if (t0 >= 0.0)
+    {
+        t0 *= t0;
+        n0 = t0 * t0 * dot(gr0, vec3(x0, y0, z0));
+    }
+    float t1 = 0.5 - x1 * x1 - y1 * y1 - z1 * z1;
+    if (t1 >= 0.0)
+    {
+        t1 *= t1;
+        n1 = t1 * t1 * dot(gr1, vec3(x1, y1, z1));
+    }
+    float t2 = 0.5 - x2 * x2 - y2 * y2 - z2 * z2;
+    if (t2 >= 0.0)
+    {
+        t2 *= t2;
+        n2 = t2 * t2 * dot(gr2, vec3(x2, y2, z2));
+    }
+    float t3 = 0.5 - x3 * x3 - y3 * y3 - z3 * z3;
+    if (t3 >= 0.0)
+    {
+        t3 *= t3;
+        n3 = t3 * t3 * dot(gr3, vec3(x3, y3, z3));
+    }
+    return (96.0 * (n0 + n1 + n2 + n3)) * 0.5 + 0.5;
+	
+}
+
+vec3 hash(vec3 p) // replace this by something better
+{
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+				  dot(p, vec3(269.5, 183.3, 246.1)),
+				  dot(p, vec3(113.5, 271.9, 124.6)));
+
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
+
+float tnoise(in vec3 p)
+{
+	    vec3 i = floor(p);
+	    vec3 f = fract(p);
+		
+		vec3 u = f * f * (3.0 - 2.0 * f);
+
+    float n = mix(mix(mix(dot(hash(i + vec3(0.0, 0.0, 0.0)), f - vec3(0.0, 0.0, 0.0)),
+	                          dot(hash(i + vec3(1.0, 0.0, 0.0)), f - vec3(1.0, 0.0, 0.0)), u.x),
+	                     mix(dot(hash(i + vec3(0.0, 1.0, 0.0)), f - vec3(0.0, 1.0, 0.0)),
+	                          dot(hash(i + vec3(1.0, 1.0, 0.0)), f - vec3(1.0, 1.0, 0.0)), u.x), u.y),
+	                mix(mix(dot(hash(i + vec3(0.0, 0.0, 1.0)), f - vec3(0.0, 0.0, 1.0)),
+	                          dot(hash(i + vec3(1.0, 0.0, 1.0)), f - vec3(1.0, 0.0, 1.0)), u.x),
+	                     mix(dot(hash(i + vec3(0.0, 1.0, 1.0)), f - vec3(0.0, 1.0, 1.0)),
+	                          dot(hash(i + vec3(1.0, 1.0, 1.0)), f - vec3(1.0, 1.0, 1.0)), u.x), u.y), u.z);
+    return 0.5 * n + 0.5;
+}
+
+float pnoise(in float3 x)
+{
+    
+    x *= 1;
+    float3 p = floor(x);
+    float3 f = frac(x);
+    f = f * f * (3.0 - 2.0 * f);
+    float2 uv = (p.xy + float2(37.0, 17.0) * p.z) + f.xy;
+    float3 rg = _NoiseTex.SampleLevel(sampler_NoiseTex, (uv), 0);
+    return lerp(rg.x, rg.y, rg.z);
+}
+
+float fbm(float3 p)
+{
+    float3x3 m = float3x3(0.00, 0.80, 0.60,
+	              -0.80, 0.36, -0.48,
+	              -0.60, -0.48, 0.64);
+    float f;
+    f = 0.5000 * noise(p);
+    p = mul(m, p) * 2.02;
+    f += 0.2500 * noise(p);
+    p = mul(m, p) * 2.03;
+    f += 0.1250 * noise(p);
+    return f;
+}
+
+uint3 To3D(uint id)
+{
+    uint xQ = id / textureSize;
+    uint x = id % textureSize;
+    uint yQ = xQ / textureSize;
+    uint y = xQ % textureSize;
+    uint z = yQ % textureSize;
+    return uint3(x, y, z);
+}
+
+[numthreads(256,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float3 pos = (float3) To3D(id.x);
+    pos /= textureSize;
+    pos *= scale;
+    float noise = fbm(pos);
+    pixelBuffer[id.x] = float4(noise, noise, noise, 1.0);
+
+}

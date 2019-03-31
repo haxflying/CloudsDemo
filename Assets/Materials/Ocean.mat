@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Ocean
+  m_Shader: {fileID: 4800000, guid: ebb76a7479cfaa547a9a61e81a975dc1, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _LayerTex:
+        m_Texture: {fileID: 2800000, guid: 02c04ba61af10f74bbf349c420e59cc8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: c5cc7c0b9dd4e5b44bca823bd21592de, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SkyTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SunLut:
+        m_Texture: {fileID: 2800000, guid: 77e2a7096b098264b8bf7928b1898446, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - BASE_SCALE: 0.47
+    - ITER_FRAGMENT: 5
+    - ITER_GEOMETRY: 3
+    - SEA_CHOPPY: 4.4
+    - SEA_FREQ: 0.1
+    - SEA_HEIGHT: 1.72
+    - SEA_SPEED: 8
+    - _AtmosphereThickness: 1
+    - _Coverage: 0.333
+    - _Exposure: 1.3
+    - _FogDensity: 1.19
+    - _FogDistance: 801
+    - _SunSize: 0.04
+    - _SunSizeConvergence: 5
+    m_Colors:
+    - SEA_BASE: {r: 0.06256675, g: 0.20168024, b: 0.3584906, a: 1}
+    - SEA_WATER_COLOR: {r: 1, g: 1, b: 1, a: 1}
+    - _CloudColor: {r: 1, g: 1, b: 1, a: 1}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _FogColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GroundColor: {r: 0.13333334, g: 0.33333334, b: 0.33333334, a: 1}
+    - _NightColor: {r: 0.003737978, g: 0.13394445, b: 0.26415092, a: 0}
+    - _SeaColor: {r: 0.0039, g: 0.045999974, b: 0.089999996, a: 1}
+    - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}

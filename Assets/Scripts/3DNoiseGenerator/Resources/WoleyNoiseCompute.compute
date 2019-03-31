@@ -1,0 +1,197 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#define vec2 float2
+#define vec3 float3
+#define vec4 float4
+#define mix lerp
+#define fract frac
+#define mod fmod
+
+RWStructuredBuffer<float4> pixelBuffer;
+int pixelBufferSize;
+int textureSize;
+float scale;
+
+Texture2D _NoiseTex;
+SamplerState sampler_NoiseTex
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+float4 _NoiseTex_TexelSize;
+
+
+float hash(in vec2 p, in float scale)
+{
+	// This is tiling part, adjusts with the scale...
+    p = mod(p, scale);
+    return fract(sin(dot(p, vec2(27.16898, 38.90563))) * 5151.5473453);
+}
+
+float hash(in vec3 p, in float scale)
+{
+    // This is tiling part, adjusts with the scale...
+    p = mod(p, scale);
+    return fract(sin(dot(p, vec3(27.16898, 38.90563, 49.40573))) * 5151.5473453);
+}
+
+float noise(in vec2 p, in float scale)
+{
+	vec2 f;
+	
+    p *= scale;
+	
+    f = fract(p);
+    p = floor(p);
+	
+    f = f * f * (3.0 - 2.0 * f);
+	
+    float res = mix(mix(hash(p, scale),
+						hash(p + vec2(1.0, 0.0), scale), f.x),
+					mix(hash(p + vec2(0.0, 1.0), scale),
+						hash(p + vec2(1.0, 1.0), scale), f.x), f.y);
+    return res;
+}
+
+float noise(in vec3 p, in float scale)
+{
+    vec3 f;
+	
+    p *= scale;
+	
+    f = fract(p);
+    p = floor(p);
+	
+    f = f * f * (3.0 - 2.0 * f);
+	
+    float resA = mix(mix(hash(p + vec3(0.0, 0.0, 0.0), scale),
+						hash(p + vec3(1.0, 0.0, 0.0), scale), f.x),
+					mix(hash(p + vec3(0.0, 1.0, 0.0), scale),
+						hash(p + vec3(1.0, 1.0, 0.0), scale), f.x), f.y);
+    
+    float resB = mix(mix(hash(p + vec3(0.0, 0.0, 1.0), scale),
+						hash(p + vec3(1.0, 0.0, 1.0), scale), f.x),
+					mix(hash(p + vec3(0.0, 1.0, 1.0), scale),
+						hash(p + vec3(1.0, 1.0, 1.0), scale), f.x), f.y);
+    
+    return mix(resA, resB, f.z);
+}
+
+float fBm5(in vec3 p, in float intScale, in float amp)
+{
+    float f = 0.0;
+    p = mod(p, intScale);
+	
+    for (int i = 0; i < 5; i++)
+    {
+        f += noise(p, intScale) * amp;
+        amp *= .5;
+        intScale *= 2.;
+    }
+    
+    return min(f, 1.0);
+}
+
+vec3 hash3(vec3 p)
+{
+    p = vec3(dot(p, vec3(127.1, 311.7, 411.0)),
+             dot(p, vec3(269.5, 183.3, 120.0)),
+             dot(p, vec3(469.5, 583.3, 520.0))
+            );
+    return fract(sin(p) * 18.5453);
+}
+
+float wrap(float n, float period)
+{
+    return n >= 0.0 ? mod(n, period) : period + n;
+}
+
+vec2 voronoi(in vec3 x, float per)
+{
+   
+    vec3 n = floor(x);
+    vec3 f = fract(x);
+
+	vec3 m = (8.0);
+    for (int k = -1; k <= 1; k++)
+        for (int j = -1; j <= 1; j++)
+            for (int i = -1; i <= 1; i++)
+            {
+        vec3 g = vec3(float(i), float(j), float(k));
+        vec3 gn = n + g;
+                gn.x = wrap(gn.x, per);
+                gn.y = wrap(gn.y, per);
+                gn.z = wrap(gn.z, per);
+        vec3 o = hash3(gn);
+        vec3 r = g - f + o;
+                float d = dot(r, r);
+                if (d < m.x)
+                    m = vec3(d, o.xy);
+            }
+
+    return vec2(sqrt(m.x), m.y + m.z);
+}
+
+float billows4(in vec3 p, in float intScale, in float amp)
+{
+    float f = 0.0;
+    p = mod(p, intScale);
+	
+    for (int i = 0; i < 4; i++)
+    {
+        f += voronoi(p * intScale, intScale).x * amp;
+        amp *= .5;
+        intScale *= 2.;
+    }
+    
+    return min(f, 1.0);
+}
+
+float billows3(in vec3 p, in float intScale, in float amp)
+{
+    float f = 0.0;
+    p = mod(p, intScale);
+	
+    for (int i = 0; i < 3; i++)
+    {
+        f += voronoi(p * intScale, intScale).x * amp;
+        amp *= .5;
+        intScale *= 2.;
+    }
+    
+    return min(f, 1.0);
+}
+
+
+uint3 To3D(uint id)
+{
+    uint xQ = id / textureSize;
+    uint x = id % textureSize;
+    uint yQ = xQ / textureSize;
+    uint y = xQ % textureSize;
+    uint z = yQ % textureSize;
+    return uint3(x, y, z);
+}
+
+[numthreads(256, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    float3 p = (float3) To3D(id.x);
+    p /= textureSize;
+    p *= scale;
+
+    const float billowScale = 4.0;
+    const float billowAmp = 0.75;
+    const float billowGamma = 1.0;
+    const float noiseScale = 6.0;
+    const float noiseAmp = 0.6;
+    const float finalMix = 0.5;
+    const float warpAmount = 1.0 / 16.0;
+
+    float bil = 1.0 - pow(billows3(p, billowScale, billowAmp), billowGamma);
+    float per = fBm5(p + (bil * warpAmount), noiseScale, noiseAmp);
+    float noise = mix(per, bil, 0.5);
+    pixelBuffer[id.x] = float4(noise, noise, noise, 1.0);
+
+}
