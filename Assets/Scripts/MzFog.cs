@@ -76,7 +76,7 @@ public class MzFog : MonoBehaviour {
             sceneParams.w = linear ? sceneEnd * invDiff : 0.0f;
             mat.SetVector("_SceneFogParams", sceneParams);
             mat.SetVector("_SceneFogMode", new Vector4((int)sceneMode, useRadialDistance ? 1 : 0, 0, 0));
-            mat.SetMatrix("_WorldToCamera", transform.worldToLocalMatrix);
+            //mat.SetMatrix("_WorldToCamera", transform.worldToLocalMatrix);
 
             int pass = 0;
             if (distanceFog && heightFog)

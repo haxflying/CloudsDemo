@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: OceanImageEffects
+  m_Shader: {fileID: 4800000, guid: c0b16493bc3e131489354dbbf0d2e0db, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - BASE_SCALE: 0.47
+    - ITER_FRAGMENT: 5
+    - ITER_GEOMETRY: 3
+    - SEA_CHOPPY: 4.4
+    - SEA_FREQ: 0.1
+    - SEA_HEIGHT: 1.72
+    - SEA_SPEED: 2
+    - _Scale: 10.0696
+    - _UnderWaterBlend: 0.905
+    m_Colors:
+    - SEA_BASE: {r: 0.09999997, g: 0.18999997, b: 0.21999997, a: 1}
+    - SEA_WATER_COLOR: {r: 0.8, g: 0.9, b: 0.6, a: 1}
+    - _EdgeColor: {r: 0.2432805, g: 0.6698113, b: 0.5276344, a: 1}
+    - _UnderWaterCol: {r: 0.1411765, g: 0.37455136, b: 0.39607844, a: 0}

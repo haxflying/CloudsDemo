@@ -41,7 +41,7 @@ Material:
     - SEA_CHOPPY: 4.4
     - SEA_FREQ: 0.1
     - SEA_HEIGHT: 1.72
-    - SEA_SPEED: 8
+    - SEA_SPEED: 2
     - _AtmosphereThickness: 1
     - _Coverage: 0.333
     - _Exposure: 1.3

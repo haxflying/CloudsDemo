@@ -89,6 +89,7 @@
 	float4 _NoiseTex_TexelSize;
 
 	sampler2D _LayerTex, _LayerTex1, _SunLut;
+	float4 _LayerTex_ST, _LayerTex1_ST;
 	float4  _AmbientColor;
 	float4 _Detail0, _Detail1;
 	float _Coverage, _OptimizationFactor, _TextureDensity;
@@ -210,8 +211,11 @@
 	    float atmoHeight = length(p - vec3(0.0, -EARTH_RADIUS, 0.0)) - EARTH_RADIUS;
 	    cloudHeight = clamp((atmoHeight-CLOUD_START)/(CLOUD_HEIGHT), 0.0, 1.0);
 	    p.z += iTime*10.3;
-	    float layer0 = textureLod(_LayerTex, float4(-0.00005*p.zx, 0,0)).g;
-	    float layer1 = textureLod(_LayerTex1, float4(-0.00005*p.zx, 0,0)).g;
+	    float2 uv = -0.00005*p.zx;
+	    float2 uv0 = uv * _LayerTex_ST.xy + _LayerTex_ST.zw;
+	    float layer0 = textureLod(_LayerTex, float4(uv0, 0,0)).g;
+	    float2 uv1 = uv * _LayerTex1_ST.xy + _LayerTex1_ST.zw;
+	    float layer1 = textureLod(_LayerTex1, float4(uv1, 0,0)).g;
 	   	float layer = lerp(layer0, layer1, _LayerBlend);
 	    float largeWeather = clamp((layer-0.18)*5.0 * _TextureDensity, 0.0, 2.0);
 	    p.x += iTime*8.3;

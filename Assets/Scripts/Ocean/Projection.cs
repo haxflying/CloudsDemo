@@ -349,7 +349,7 @@ public class Projection
     }
 
     /// <summary>
-    /// Same as Unity's transform look.
+    /// Same as Unity's transform look. projector to world
     /// </summary>
     public void LookAt(Vector3 position, Vector3 target, Vector3 up)
     {

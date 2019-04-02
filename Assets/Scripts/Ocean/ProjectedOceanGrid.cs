@@ -12,6 +12,7 @@ public class ProjectedOceanGrid : MonoBehaviour {
     private GameObject m_grid;
     private Projection m_projection;
 
+
     public Vector2 WorldToUV(Vector3 pos)
     {
 
@@ -31,6 +32,19 @@ public class ProjectedOceanGrid : MonoBehaviour {
         float t1 = (Mathf.Abs(Vector3.Dot(pos - v3, v2 - v3)) / (v2 - v3).magnitude);
         Debug.Log(t0 + " " +  t1);
         return uv;
+    }
+
+    public Matrix4x4 Interpolation
+    {
+        get
+        {
+            return m_projection.Interpolation;
+        }
+    }
+
+    public void SetTime(float t)
+    {
+        oceanMat.SetFloat("_ZTime", t);
     }
 
     private void Start()

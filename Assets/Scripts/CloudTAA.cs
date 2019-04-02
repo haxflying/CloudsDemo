@@ -10,6 +10,8 @@ public class CloudTAA : MonoBehaviour {
     [Range(1f, 4f)]
     public float downSample = 1f;
 
+    public bool enableTimeLine = true;
+
     [Header("Material Property")]
     [Range(0f, 1f)]
     public float coverage = 1;
@@ -110,9 +112,12 @@ public class CloudTAA : MonoBehaviour {
 
     private void Update()
     {
-        mat.SetFloat("_LayerBlend", blendFactor);
-        mat.SetFloat("_Coverage", coverage);
-        mat.SetFloat("_TextureDensity", textureDensity);
+        if (enableTimeLine)
+        {
+            mat.SetFloat("_LayerBlend", blendFactor);
+            mat.SetFloat("_Coverage", coverage);
+            mat.SetFloat("_TextureDensity", textureDensity);
+        }
     }
 
 
