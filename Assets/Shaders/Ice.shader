@@ -92,7 +92,8 @@ Shader "Nature/Terrain/Ice" {
         	mixedDiffuse += (1 - slope) * tex2D(_Splat1, IN.uv_Splat1) * half4(1.0, 1.0, 1.0, defaultAlpha.g);
 
 	        fixed4 nrm = 0.0f;
-	        nrm += tex2D(_Normal0, IN.uv_Splat0);
+	        nrm += slope * tex2D(_Normal0, IN.uv_Splat0);
+	        nrm += (1 - slope) * tex2D(_Normal1, IN.uv_Splat1);
 	        mixedNormal = UnpackNormal(nrm);
         }
 

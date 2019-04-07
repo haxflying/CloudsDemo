@@ -4,13 +4,14 @@
 	{
 		//_MainTex ("Texture", 2D) = "white" {}
 		[HDR]_AmbientColor("Ambient Color", Color) = (0.2, 0.5, 1.0, 1.0)
+		_AborbAmount("Absorption Amount", Range(0.0, 1.0)) = 1.0
 		_SunLut("Sun Lut", 2D) = "white" {}
 		//_NoiseTex("Noise Texture",2D) = "white"{}
 		_NoiseVolume("_NoiseVolume", 3D)= "white" {}
 		_LayerTex("Layer Texture", 2D) = "white"{} 
 		_LayerTex1("Layer Texture 1", 2D) = "white" {}
 		_LayerBlend("Layer Blend Factor", Range(0.0, 1.0)) = 0.0
-
+		_CloudThickness("Cloud Thickness", Range(300, 3000)) = 600
 		_Coverage("Coverage",Range(0.0, 1.0)) = 1.0
 		_TextureDensity("Texture Density", Range(0.0, 1.0)) = 1.0
 		_OptimizationFactor("OptimizationFactor",Range(0.0, 1.0)) = 0.0
@@ -47,7 +48,7 @@
 	#define textureLod tex2Dlod	
 	#define EARTH_RADIUS 6300e3
 	#define CLOUD_START 1200.0
-	#define CLOUD_HEIGHT 600.0
+	#define CLOUD_HEIGHT _CloudThickness
 	#define SUN_POWER 750.0
 	#define LOW_SCATTER vec3(1.0, 0.7, 0.5)
 
@@ -98,7 +99,7 @@
 	float _Speed;
 	float4 _FogColor;
 	float _FogDensity, _FogDistance;
-
+	float _CloudThickness, _AborbAmount;
 	 
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
@@ -206,20 +207,29 @@
 	    return dot(expValues, expValWeight);
 	}
 
+	float layerBlend(float2 uv)
+	{
+		float2 uv0 = uv * _LayerTex_ST.xy + _LayerTex_ST.zw;
+	    float layer0 = textureLod(_LayerTex, float4(uv0, 0,0)).g;
+	    float2 uv1 = uv * _LayerTex1_ST.xy + _LayerTex1_ST.zw;
+	    float layer1 = textureLod(_LayerTex1, float4(uv1, 0,0)).g;
+	   	float layer = lerp(layer0, layer1, _LayerBlend);
+	   	return layer;
+	}
+
 	float clouds(vec3 p, out float cloudHeight, bool fast)
 	{
 	    float atmoHeight = length(p - vec3(0.0, -EARTH_RADIUS, 0.0)) - EARTH_RADIUS;
 	    cloudHeight = clamp((atmoHeight-CLOUD_START)/(CLOUD_HEIGHT), 0.0, 1.0);
 	    p.z += iTime*10.3;
 	    float2 uv = -0.00005*p.zx;
-	    float2 uv0 = uv * _LayerTex_ST.xy + _LayerTex_ST.zw;
-	    float layer0 = textureLod(_LayerTex, float4(uv0, 0,0)).g;
-	    float2 uv1 = uv * _LayerTex1_ST.xy + _LayerTex1_ST.zw;
-	    float layer1 = textureLod(_LayerTex1, float4(uv1, 0,0)).g;
-	   	float layer = lerp(layer0, layer1, _LayerBlend);
+	    float layer = layerBlend(uv);
 	    float largeWeather = clamp((layer-0.18)*5.0 * _TextureDensity, 0.0, 2.0);
+
 	    p.x += iTime*8.3;
-	    float weather = largeWeather*max(0.0, textureLod(_LayerTex, float4(0.0002*p.zx, 0,0)).r-0.18)/0.72;
+	    uv = -0.00002*p.zx;
+	    layer = textureLod(_LayerTex, float4(uv, 0,0)).g;
+	    float weather = largeWeather*max(0.0, layer-0.18)/0.72;
 	    weather *= smoothstep(0.0, 0.5, cloudHeight) * smoothstep(1.0, 0.5, cloudHeight);
 	    float cloudShape = pow(weather, 0.3+1.5*smoothstep(0.2, 0.5, cloudHeight)) * _Coverage;
 	    if(cloudShape <= 0.0)
@@ -260,7 +270,7 @@
 	    //return 0;
 	    float scatterAmount = mix(0.008, 1.0, smoothstep(0.96, 0.0, mu));
 	    float beersLaw = exp(-stepL*lighRayDen)+0.5*scatterAmount*exp(-0.1*stepL*lighRayDen)+scatterAmount*0.4*exp(-0.02*stepL*lighRayDen);
-	    return beersLaw * phaseFunction * mix(0.05 + 1.5*pow(min(1.0, dC*8.5), 0.3+5.5*cloudHeight), 1.0, clamp(lighRayDen*0.4, 0.0, 1.0));
+	    return beersLaw * phaseFunction * mix(0.05 + 1.5*pow(min(1.0, dC*8.5), 0.3+5.5*cloudHeight), 1 - _AborbAmount, clamp(lighRayDen*0.4, 0.0, 1.0));
 	}
 
 	vec3 skyRay(vec3 org, vec3 dir, vec3 sun_direction, vec3 sunCol, vec3 skyCol, vec3 bgCol, bool fast)
@@ -268,7 +278,7 @@
 	    const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		const float ATM_END = ATM_START+CLOUD_HEIGHT;
 	    
-	    int nbSample = fast ? 13 : 35;   
+	    int nbSample = fast ? 13 : 95;
 	    vec3 color = 0;
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
 	    float distToAtmEnd = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_END);

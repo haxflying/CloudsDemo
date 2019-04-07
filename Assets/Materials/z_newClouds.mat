@@ -20,12 +20,12 @@ Material:
     m_TexEnvs:
     - _LayerTex:
         m_Texture: {fileID: 2800000, guid: 02c04ba61af10f74bbf349c420e59cc8, type: 3}
-        m_Scale: {x: 0.5, y: 0.5}
-        m_Offset: {x: 0, y: 0}
-    - _LayerTex1:
-        m_Texture: {fileID: 2800000, guid: efd4b9b2b7d755a49bde6f56e05bec9e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _LayerTex1:
+        m_Texture: {fileID: 2800000, guid: 0ae32f65252445942a261eef3a875afa, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0.65, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -43,9 +43,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _AborbAmount: 0.724
     - _AtmosphereThickness: 1
     - _BackCloudDensity: 0.704
-    - _Coverage: 0.676
+    - _CloudThickness: 3000
+    - _Coverage: 0.924
     - _Exposure: 0.65
     - _FadeDistance: 50000
     - _FadeRange: 10000
@@ -53,16 +55,16 @@ Material:
     - _FogDistance: 19.14
     - _LayerBlend: 0
     - _OptimizationFactor: 0
-    - _Speed: 2.04
+    - _Speed: 3.36
     - _SunSize: 0.04
     - _SunSizeConvergence: 5
     - _TAA: 1
-    - _TextureDensity: 0.32
+    - _TextureDensity: 0.468
     - _ZTest: 4
     m_Colors:
-    - _AmbientColor: {r: 0.4708971, g: 0.6236161, b: 0.6981132, a: 1}
-    - _Detail0: {r: 1, g: 1, b: 0.36, a: 17.86}
-    - _Detail1: {r: 1, g: 1, b: 1, a: 24.33}
+    - _AmbientColor: {r: 0.21137415, g: 0.30994287, b: 0.4716981, a: 1}
+    - _Detail0: {r: 1, g: 4.14, b: 0.36, a: 2.91}
+    - _Detail1: {r: 1, g: 1, b: 1, a: 4.9}
     - _FogColor: {r: 1, g: 1, b: 1, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
