@@ -304,6 +304,7 @@
 	   	//return noise(p);
 	   	
 	   	blendAlpha = Luminance(color);
+	   	blendAlpha = max(blendAlpha, bgCol.a);
 	   	//return blendAlpha;
 	    return color * sqrt(skyCol * 6)  * (1 - bgCol.a) + background * T;
 	}
