@@ -31,12 +31,12 @@ Material:
     - _Glossiness: 0.5
     - _Metallic: 0
     - _SearchConeAngle: 0.01
-    - _ShadowLightPercent: 4.3
-    - _TexScale: 50
+    - _ShadowLightPercent: 10.1
+    - _TexScale: 59.64
     - _Variation: 100
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorDark: {r: 0.08610717, g: 0.24780872, b: 0.4056604, a: 1}
+    - _ColorDark: {r: 0.14929691, g: 0.36501494, b: 0.5754717, a: 1}
     - _ColorLight: {r: 1, g: 0.93290335, b: 0.8066038, a: 1}
-    - _MicroRoughness: {r: 0.94, g: 0.06, b: 0, a: 0}
-    - _Roughness: {r: 1.16, g: 1.98, b: 0, a: 0}
+    - _MicroRoughness: {r: 0.26, g: 0.06, b: 0, a: 0}
+    - _Roughness: {r: 2.54, g: 1.98, b: 0, a: 0}

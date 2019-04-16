@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+		_MaskTex("MaskTex", 2D) = "white" {}
 		//_MainTex ("Texture", 2D) = "white" {}
 		[HDR]_AmbientColor("Ambient Color", Color) = (0.2, 0.5, 1.0, 1.0)
 		_AborbAmount("Absorption Amount", Range(0.0, 1.0)) = 1.0
@@ -56,30 +57,8 @@
 	#include "Lighting.cginc"
 	#include "Atmosphere.cginc"
 
-	/*
-	struct appdata
-	{
-		float4 vertex : POSITION;
-		float2 uv : TEXCOORD0;
-	};
-
-	struct v2f
-	{
-		float2 uv : TEXCOORD0;
-		float3 wpos : TEXCOORD1;
-		float4 screenUV : TEXCOORD2;
-		float3 ray : TEXCOORD3;
-		float4 pos : SV_POSITION;
-		// for HQ sun disk, we need vertex itself to calculate ray-dir per-pixel
-        float3  vertex : TEXCOORD4;         
-        // calculate sky colors in vprog
-        half3   groundColor : TEXCOORD5;          
-        half3   skyColor : TEXCOORD6;             
-        half3   sunColor : TEXCOORD7;             
-	};*/
-
 	sampler2D _MainTex;
-
+	sampler2D _MaskTex;
 	sampler2D _CameraRender;
 	sampler2D _currentFrame;
 	sampler2D _prev_frame;
@@ -101,6 +80,12 @@
 	float _FogDensity, _FogDistance;
 	float _CloudThickness, _AborbAmount;
 	 
+	struct FragmentOutput
+    {
+        half4 dest0 : SV_Target0;
+        half4 dest1 : SV_Target1;
+    };
+
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 	
@@ -273,12 +258,13 @@
 	    return beersLaw * phaseFunction * mix(0.05 + 1.5*pow(min(1.0, dC*8.5), 0.3+5.5*cloudHeight), 1 - _AborbAmount, clamp(lighRayDen*0.4, 0.0, 1.0));
 	}
 
-	vec3 skyRay(vec3 org, vec3 dir, vec3 sun_direction, vec3 sunCol, vec3 skyCol, vec3 bgCol, bool fast)
+	uniform int _cloudIteration; 
+	vec3 skyRay(vec3 org, vec3 dir, vec3 sun_direction, vec3 sunCol, vec3 skyCol, vec4 bgCol, out float blendAlpha, bool fast)
 	{
 	    const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		const float ATM_END = ATM_START+CLOUD_HEIGHT;
 	    
-	    int nbSample = fast ? 13 : 95;
+	    int nbSample = fast ? 13 : _cloudIteration;
 	    vec3 color = 0;
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
 	    float distToAtmEnd = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_END);
@@ -288,6 +274,7 @@
 	    float mu = dot(sun_direction, dir);
 	    float phaseFunction = numericalMieFit(mu);
 	    p += dir*stepS*hash(dot(dir, vec3(12.256, 2.646, 6.356)) + iTime);
+	    float thickness = 0;
 	    [loop]
 		for(int i=0; i<nbSample; i++)
 		{        
@@ -295,6 +282,7 @@
 			float density = clouds(p, cloudHeight, fast);
 			if(density>0.)
 			{
+				thickness += density;
 				float intensity = lightRay(p, phaseFunction, density, mu, sun_direction, cloudHeight, fast);        
 	            vec3 ambient = (0.5 + 0.6*cloudHeight)*_AmbientColor.rgb*6.5 + (0.8) * max(0.0, 1.0-2.0*cloudHeight);
 	            vec3 radiance = ambient * sqrt(sunCol) + SUN_POWER*intensity*sunCol;
@@ -302,54 +290,22 @@
 	            color += T*(radiance - radiance * exp(-density * stepS)) / density;   // By Seb Hillaire                  
 	            T *= exp(-density*stepS);            
 				if( T <= 0.05)
+				{
+					T = 0;
 					break;
+				}
 	        }
 	        stepS *= 1 + i*i*i*_OptimizationFactor;
 			p += dir*stepS;
 		}	       
-	    
 		vec3 background = bgCol * 6.0;//6.0*mix(vec3(0.2, 0.52, 1.0), vec3(0.8, 0.95, 1.0), pow(0.5+0.5*mu, 15.0))+mix((3.5), (0.0), min(1.0, 2.3*dir.y));
 	    //if(!fast) 	background += T*(1e4*smoothstep(0.9998, 1.0, mu)); //Draw Sun
-	    color = color * sqrt(skyCol * 6) + background * T;
+	    //color = color * sqrt(skyCol * 6) + background * T;
 	   	//return noise(p);
-	    return color;
-	}
-
-	float cloudShadow(vec3 org, vec3 dir, vec3 sun_direction)
-	{
-		const float ATM_START = EARTH_RADIUS+CLOUD_START;
-		const float ATM_END = ATM_START+CLOUD_HEIGHT;
-		int nbSample = 35;   
-	    vec3 color = 0;
-	    float cloudHeight = 0;
-		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
-		float3 p = org;
-	    float stepS = (distToAtmStart) / float(nbSample);  
-	    p += dir*stepS*hash(dot(dir, vec3(12.256, 2.646, 6.356)) + iTime);
-	    float T = 0;
-	    [loop]
-	    for (int i = 0; i < nbSample; ++i)
-	    {
-	    	distToAtmStart = intersectSphere(p, sun_direction, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
-	    	float distToAtmEnd = intersectSphere(p, sun_direction, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_END);
-	    	float pp = p + distToAtmStart * sun_direction;
-	    	float stepSS = (distToAtmEnd - distToAtmStart)/3.0;
-	    	half shadow = 0.0;
-	    	[loop]
-	    	for (int j = 0; j < 3; ++j)
-	    	{
-	    		float density = clouds(pp, cloudHeight, true);
-	    		if(density > 0)
-	    		{
-	    			shadow = 1.0;
-	    			break;
-	    		}
-	    		pp += sun_direction * stepSS;
-	    	}
-
-	    	T += shadow;//exp(-0.4 * stepS);
-	    }
-	    return clamp(T, 0, 1);
+	   	
+	   	blendAlpha = Luminance(color);
+	   	//return blendAlpha;
+	    return color * sqrt(skyCol * 6)  * (1 - bgCol.a) + background * T;
 	}
 
 	vec3 tonemapACES( vec3 x )
@@ -372,15 +328,20 @@
 	
 	fixed4 frag_sky (v2f i) : SV_Target
 	{
-		//return i.ray.y;
+		FragmentOutput o;
+
+		i.screenUV.xy /= i.screenUV.w;
 		half3 col = 0;
 		fixed4 frame = tex2D(_CameraRender, i.uv);
 
+		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
+		float dpth = Linear01Depth(rawDepth);
+
 		i.ray *= (_ProjectionParams.z /i.ray.z);
-		float3 vpos = i.ray * 1;
+		float3 vpos = i.ray * dpth;
 		float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
 
-		i.screenUV.xy /= i.screenUV.w;
+		
 
 		float3 org = _WorldSpaceCameraPos;
 		float3 dir = normalize(wpos - _WorldSpaceCameraPos);
@@ -389,14 +350,14 @@
 		const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
 
+
 		//half alpha = cosLookat < cosTangent ? 1 : 0;//smoothstep(0, 1,(_FadeDistance - distToAtmStart)/_FadeRange);
 		float3 fogCol = _FogColor.rgb;
+		float blendAlpha = 1;
 		if(dir.y < -0.1)
-			col = frame;		
+			col = 0;		
 		else
 		{
-			//vert_bg(dir, i);
-			//return float4(i.sunColor, 1);
 			//cloud render
 			float lerpFactor = saturate(1 - saturate(sun_direction.y));
 
@@ -406,32 +367,19 @@
 			//	sun_direction.y *= 5; //调整夜晚光线 temp version
 			sun_direction = normalize(sun_direction);
 
-			 col = skyRay(org, dir, sun_direction, sunColor, frame, frame, false);
-			 //tonemapping			 
-			 col = tonemapACES(col / 6.0);
-			 fogCol = tonemapACES(_FogColor.rgb * i.skyColor);
-			 //col = sunColor;
+			col = skyRay(org, dir, sun_direction, sunColor, frame, frame, blendAlpha, false);
+			//tonemapping			 
+			  col = tonemapACES(col / 6.0);
+			//fogCol = tonemapACES(_FogColor.rgb * i.skyColor);
 		}
-		//float shadow = cloudShadow(org, dir, sun_direction);
-		//col *= 1 - shadow;
-		
-		float3 finalCol = col;//alpha * col + (1 - alpha) * frame;
+
+		float4 finalCol = float4(col, blendAlpha);//alpha * col + (1 - alpha) * frame;
 
 		//float fog = ComputeFogFactor((length(wpos - _WorldSpaceCameraPos) - distToAtmStart)/(-_FogDistance * 1000));		
 		//finalCol = lerp(finalCol, fogCol, 1 - fog);	
-		finalCol = lerp(frame, finalCol, saturate(dir.y * 10));
-		return fixed4(finalCol, 1.0);
-	}
-
-	fixed4 frag_shadow (v2f i) : SV_Target 
-	{
-		i.ray *= (_ProjectionParams.z /i.ray.z);
-		float3 vpos = i.ray * 1;
-		float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
-		float3 org = _WorldSpaceCameraPos;
-		float3 dir = normalize(wpos - _WorldSpaceCameraPos);
-		float3 sun_direction = _WorldSpaceLightPos0.xyz;
-		return 0;
+		finalCol = lerp(float4(frame.rgb, 1), finalCol, saturate(dir.y * 10 - 0.3));
+		//return blendAlpha;
+		return float4(finalCol.rgb, blendAlpha);
 	}
 	
 	ENDCG
@@ -514,7 +462,8 @@
 				vec2(1, 0),  vec2(0, -1), 
 				vec2(0, 1),  vec2(-1, 0)};
 
-				float3 current = RGBToYCoCg(tex2D(_currentFrame, i.uv));
+				float4 currentFrame = tex2D(_currentFrame, i.uv);
+				float3 current = RGBToYCoCg(currentFrame.rgb);
 				float3 history = RGBToYCoCg(tex2D(_prev_frame, i.uv));
 
 				float3 colorAvg = current;
@@ -537,25 +486,52 @@
 
 				history = clamp(history, colorMin, colorMax);
 				#if _TAA_ON
-					return float4(YCoCgToRGB(lerp(current, history, 0.95)), 1.0) ;
+					return float4(YCoCgToRGB(lerp(current, history, 0.95)), currentFrame.a) ;
 				#else
 					return tex2D(_currentFrame, i.uv);
 				#endif
 			}
 			ENDCG
 		}
-		/*
+
 		Pass
 		{
-			Name "cloudShadow"
-
+			Name "combine"
 			CGPROGRAM
-			#pragma vertex vert_sky
-			#pragma fragment frag_shadow
+			#pragma vertex vert
+			#pragma fragment frag
+			struct v2f_taa
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+				float3 ray : TEXCOORD1;
+			};
 
-			#pragma exclude_renderers d3d11_9x
-			#pragma exclude_renderers d3d9
+			v2f_taa vert (appdata v)
+			{
+				v2f_taa o;
+				//o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, 1);
+				o.uv = v.uv;
+				o.ray = mul(unity_CameraInvProjection, float4((float2(v.uv.x, v.uv.y) - 0.5) * 2, -1, -1));
+				return o;
+			}
+
+			sampler2D _clouds_frame, _QuarterResDepthBuffer;
+
+			fixed4 frag (v2f_taa i) : SV_Target
+			{
+				fixed alpha = 1 - tex2D(_currentFrame, i.uv).a;
+				i.uv.y = 1 - i.uv.y;
+				fixed4 bg = tex2D(_CameraRender, i.uv);
+				bg.rgb = tonemapACES(bg.rgb);
+				fixed4 clouds = tex2D(_clouds_frame, i.uv);
+				//clouds += (1 - alpha) * bg;
+				return clouds;
+				
+			}
 			ENDCG
-		}*/
+		}
+
 	}
 }

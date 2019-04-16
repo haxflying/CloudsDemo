@@ -365,7 +365,7 @@ SubShader {
             col = LINEAR_2_OUTPUT(col);
         #endif
 
-            return half4(col,1.0);
+            return half4(col,0.0);
 
         }
         ENDCG
