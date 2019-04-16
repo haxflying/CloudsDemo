@@ -6,8 +6,8 @@ using UnityEngine.Rendering;
 [ExecuteInEditMode]
 public class CloudTAA : MonoBehaviour {
 
-    public Material cloudsMat, blurMat;
-
+    public Material cloudsMat, blurMat, lightMat;
+    public bool renderClouds = true;
     public bool useBlur;
     [Range(30, 150)]
     public int cloudIteration = 90;
@@ -96,6 +96,9 @@ public class CloudTAA : MonoBehaviour {
 
         cb.Clear();
 
+        if (!renderClouds)
+            return;
+
         int width = (int)((float)Screen.width / downSample);
         int height = (int)((float)Screen.height / downSample);
 
@@ -172,6 +175,20 @@ public class CloudTAA : MonoBehaviour {
             cloudsMat.SetFloat("_LayerBlend", blendFactor);
             cloudsMat.SetFloat("_Coverage", coverage);
             cloudsMat.SetFloat("_TextureDensity", textureDensity);
+        }
+
+        {
+            lightMat.SetTexture("_LayerTex", cloudsMat.GetTexture("_LayerTex"));
+            lightMat.SetTexture("_LayerTex1", cloudsMat.GetTexture("_LayerTex1"));
+            lightMat.SetTexture("_NoiseVolume", cloudsMat.GetTexture("_NoiseVolume"));
+            lightMat.SetFloat("_LayerBlend", cloudsMat.GetFloat("_LayerBlend"));
+            lightMat.SetFloat("_CloudThickness", cloudsMat.GetFloat("_CloudThickness"));
+            lightMat.SetFloat("_Coverage", cloudsMat.GetFloat("_Coverage"));
+            lightMat.SetFloat("_Speed", cloudsMat.GetFloat("_Speed"));
+            lightMat.SetFloat("_TextureDensity", cloudsMat.GetFloat("_TextureDensity"));
+            lightMat.SetVector("_Detail0", cloudsMat.GetVector("_Detail0"));
+            lightMat.SetVector("_Detail1", cloudsMat.GetVector("_Detail1"));
+
         }
     }
 }

@@ -1276,9 +1276,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cloudsMat: {fileID: 2100000, guid: ffdd8e3ac90cc794fab585020840c917, type: 2}
   blurMat: {fileID: 2100000, guid: 0400d2d68a5866a4fae06e8ad244b46d, type: 2}
+  lightMat: {fileID: 2100000, guid: fd24ff10831d48447ad76fe8f8c83a41, type: 2}
+  renderClouds: 1
   useBlur: 1
   cloudIteration: 60
-  downSample: 4
+  bilateralBlurDiffScale: 20
+  downSample: 2
   enableTimeLine: 0
   coverage: 1
   blendFactor: 0
@@ -1365,7 +1368,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 69623508}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9d9c911f99c7bd4a9a57961b6ae5843, type: 3}
   m_Name: 

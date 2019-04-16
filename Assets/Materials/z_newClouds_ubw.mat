@@ -50,16 +50,16 @@ Material:
     - _AborbAmount: 0.96
     - _AtmosphereThickness: 1
     - _BackCloudDensity: 0.704
-    - _CloudThickness: 1335
-    - _Coverage: 0.805
+    - _CloudThickness: 2005
+    - _Coverage: 1
     - _Exposure: 0.65
     - _FadeDistance: 50000
     - _FadeRange: 10000
     - _FogDensity: 2.2
     - _FogDistance: 19.14
-    - _LayerBlend: 0.792
+    - _LayerBlend: 0.507
     - _OptimizationFactor: 0
-    - _Speed: 3.36
+    - _Speed: 10
     - _SunSize: 0.04
     - _SunSizeConvergence: 5
     - _TAA: 1
@@ -68,7 +68,7 @@ Material:
     m_Colors:
     - _AmbientColor: {r: 0.21137415, g: 0.30994287, b: 0.4716981, a: 1}
     - _Detail0: {r: 1, g: 0.81, b: 0.36, a: 6.13}
-    - _Detail1: {r: 1, g: 1, b: 1, a: 1.52}
+    - _Detail1: {r: 1, g: 1, b: 1, a: 3.31}
     - _FogColor: {r: 1, g: 1, b: 1, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
