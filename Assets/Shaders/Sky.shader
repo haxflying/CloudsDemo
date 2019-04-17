@@ -240,8 +240,6 @@ SubShader {
                     samplePoint += sampleRay;
                 }
 
-
-
                 // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
                 cIn = frontColor * (kInvWavelength * kKrESun);
                 cOut = frontColor * kKmESun;

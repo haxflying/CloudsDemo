@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class VL_Test : MonoBehaviour {
 
-    public Texture2D mask;
     public Material mat;
+
+    [Range(0, 2f)]
+    public float sun_density = 1f;
+    public bool debugVlight = false;
+
+    [Range(1f, 4f)]
+    public float downSample = 2f;
 
     [Range(0, 0.99f)]
     public float MieG = 0.6f;
@@ -19,9 +25,25 @@ public class VL_Test : MonoBehaviour {
     {
         if(mat != null)
         {
-            mat.SetTexture("_MaskTex", mask);
             mat.SetVector("_MieG", new Vector4(1 - (MieG * MieG), 1 + (MieG * MieG), 2 * MieG, 1.0f / (4.0f * Mathf.PI)));
-            Graphics.Blit(src, dst, mat, 0);
+            mat.SetFloat("sun_density", sun_density);
+
+            int width = Mathf.FloorToInt((Screen.width / downSample));
+            int height = Mathf.FloorToInt((Screen.height / downSample));
+            RenderTexture down_buffer = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf);
+
+            if (debugVlight)
+            {
+                Graphics.Blit(src, dst, mat, 0);
+            }
+            else
+            {
+                Graphics.Blit(src, down_buffer, mat, 0);
+                mat.SetTexture("vlight_Tex", down_buffer);
+                Graphics.Blit(src, dst, mat, 1);
+            }
+
+            RenderTexture.ReleaseTemporary(down_buffer);
         }
         else
         {

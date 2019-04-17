@@ -1373,8 +1373,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d9c911f99c7bd4a9a57961b6ae5843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mask: {fileID: 2800000, guid: ed47bd8171cf79d4daa37acb9d698d46, type: 3}
   mat: {fileID: 2100000, guid: fd24ff10831d48447ad76fe8f8c83a41, type: 2}
+  sun_density: 1
+  debugVlight: 0
+  downSample: 4
   MieG: 0.6
 --- !u!1 &73175204
 GameObject:
@@ -10977,13 +10979,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 655385615}
-  m_LocalRotation: {x: 0.9128135, y: 0.00000016973826, z: -0.00000007907489, w: 0.4083767}
+  m_LocalRotation: {x: 0.9941835, y: 0.00000013717295, z: -0.00000012746568, w: 0.107699804}
   m_LocalPosition: {x: 491.4, y: -6.4, z: 563.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 131.794, y: -0.000015258789, z: 0}
+  m_LocalEulerAnglesHint: {x: 167.635, y: -0.000015258789, z: 0}
 --- !u!1 &655548140
 GameObject:
   m_ObjectHideFlags: 0

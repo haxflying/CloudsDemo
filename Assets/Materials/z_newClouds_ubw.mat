@@ -51,7 +51,7 @@ Material:
     - _AtmosphereThickness: 1
     - _BackCloudDensity: 0.704
     - _CloudThickness: 2005
-    - _Coverage: 1
+    - _Coverage: 0.676
     - _Exposure: 0.65
     - _FadeDistance: 50000
     - _FadeRange: 10000
