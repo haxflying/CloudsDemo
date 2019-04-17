@@ -54,14 +54,6 @@
 	float4 _Detail0, _Detail1;
 	float _Coverage, _TextureDensity;
 
-	float sun_density;
-
-	#define kRAYLEIGH (lerp(0.0, 0.0025, pow(_CloudThickness,2.5)))      // Rayleigh constant
-	#define kKrESun (kRAYLEIGH * sun_density)
-	#define OUTER_RADIUS 1.025
-	static const float kInnerRadius = 1.0;
-	static const float kCameraHeight = 0.0001;
-	static const float kScaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;
 
 	float MieScattering(float cosAngle, float4 g)
 	{
@@ -159,6 +151,51 @@
 
 	}
 
+	float _AtmosphereThickness;
+	float sun_density;
+	float light_density;
+
+	#define kRAYLEIGH (lerp(0.0, 0.0025, pow(_AtmosphereThickness,2.5)))      // Rayleigh constant
+	#define kMIE 0.0010   
+	#define kKrESun (kRAYLEIGH * sun_density)
+	#define OUTER_RADIUS 1.025
+	#define kMAX_SCATTER 50.0
+
+	static const float3 kDefaultScatteringWavelength = float3(.65, .57, .475);
+	static const float kInnerRadius = 1.0;
+	static const float kInnerRadius2 = 1.0;
+	static const float kOuterRadius = OUTER_RADIUS;
+	static const float kOuterRadius2 = OUTER_RADIUS*OUTER_RADIUS;
+	static const float kCameraHeight = 0.0001;
+	static const float kScale = 1.0 / (OUTER_RADIUS - 1.0); //1 / H
+	static const float kScaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25; //4/H
+	static const float kKm4PI = kMIE * 4.0 * 3.14159265;
+
+	float scale(float inCos)
+	{
+		float x = 1.0 - inCos;
+		return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));
+	}
+
+	float4 getSunColor()
+	{
+		float3 eyeRay = _WorldSpaceLightPos0.xyz;
+		float3 kInvWavelength = 1.0 / pow(kDefaultScatteringWavelength, 4);
+		float kKr4PI = kRAYLEIGH * 4.0 * 3.14159265;
+
+		float far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+		float scaledLength = far * kScale;
+		float3 cameraPos = float3(0,kInnerRadius + kCameraHeight,0);
+		float height = kInnerRadius + kCameraHeight;
+        float depth = exp(kScaleOverScaleDepth * (-kCameraHeight)); //归一化后的光学厚度 exp(-4 * h / H)
+        float startAngle = dot(eyeRay, cameraPos) / height; //除以height用来给camerapos归一化
+        float startOffset = depth*scale(startAngle);//通过scale复原归一化，得到原始光学厚度
+        float3 attenuate = exp(-clamp(startOffset, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
+		fixed3 col = attenuate * (depth * scaledLength);
+		col *= kInvWavelength * kKrESun;
+		return fixed4(col, 1);
+	}
+
 	float getAttenuation(float3 p, float3 lightDir)
 	{
 		const float START = EARTH_RADIUS + CLOUD_START;	
@@ -177,7 +214,7 @@
 		[loop]
 		for (int i = 0; i < nlSample; ++i)
 		{
-			float density = clouds(p, cloudHeight, true);
+			float density = clouds(p, cloudHeight, false);
 			
 			//density = 0;
 			atten = max(atten, density);
@@ -203,7 +240,7 @@
 		float4 vlight = 0;
 		float3 p = o;
 		p += dir * stepSize * hash(dot(p, float3(12.256, 2.646, 6.356)) + _Time.y);
-		float density = sun_density;
+		float density = light_density;
 
 		[loop]
 		for (int i = 0; i < nbSample; ++i)
@@ -221,6 +258,7 @@
 		//vlight *= MieScattering(cosAngle, _MieG);
 		
 		vlight = max(0, vlight);
+		vlight *= getSunColor() * _LightColor0;
 		return vlight;
 	}
 

@@ -2,12 +2,16 @@
 {
 	Properties
 	{
-		_MaskTex("MaskTex", 2D) = "white" {}
 		//_MainTex ("Texture", 2D) = "white" {}
 		[HDR]_AmbientColor("Ambient Color", Color) = (0.2, 0.5, 1.0, 1.0)
 		_AborbAmount("Absorption Amount", Range(0.0, 1.0)) = 1.0
+		[Space(20)]
+		[Toggle]_SUNLUT("Use Sun Lut", Float) = 0
 		_SunLut("Sun Lut", 2D) = "white" {}
+		_AtmosphereThickness("AtmosphereThickness", Float) = 1
+		sun_density("sun_density", Float) = 8
 		//_NoiseTex("Noise Texture",2D) = "white"{}
+		[Space(20)]
 		_NoiseVolume("_NoiseVolume", 3D)= "white" {}
 		_LayerTex("Layer Texture", 2D) = "white"{} 
 		_LayerTex1("Layer Texture 1", 2D) = "white" {}
@@ -22,16 +26,10 @@
 		_FadeDistance("Fade Distance", Float) = 1000
 		_FadeRange("Fade Range", Float) = 1200
 		_BackCloudDensity("Background Cloud Density", Range(0, 1)) = 0.5
-
+		[Space(20)]
 		_FogColor("Fog Color", Color) = (1,1,1,1)
 		_FogDensity("Fog Density", Range(0, 5)) = 1
 		_FogDistance("Fog Distance",Range(0, 20)) = 15
-
-		_SunSize ("Sun Size", Range(0,1)) = 0.04
-	    _SunSizeConvergence("Sun Size Convergence", Range(1,10)) = 5
-	    _AtmosphereThickness ("Atmosphere Thickness", Range(0,5)) = 1.0
-	    _SkyTint ("Sky Tint", Color) = (.5, .5, .5, 1)
-	    _Exposure("Exposure", Range(0, 8)) = 1.3
 
 		[Toggle]_TAA("TAA", Float) = 1
 		[Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("ZTest", Float) = 0
@@ -56,6 +54,8 @@
 	#include "UnityCG.cginc"
 	#include "Lighting.cginc"
 	#include "Atmosphere.cginc"
+
+	#pragma shader_feature _SUNLUT_ON
 
 	sampler2D _MainTex;
 	sampler2D _MaskTex;
@@ -361,8 +361,12 @@
 		{
 			//cloud render
 			float lerpFactor = saturate(1 - saturate(sun_direction.y));
-
-			float3 sunColor = tex2D(_SunLut, float2(lerpFactor * lerpFactor, 0.5));
+			float3 sunColor = 0;
+			#if _SUNLUT_ON
+			sunColor = tex2D(_SunLut, float2(lerpFactor * lerpFactor, 0.5));
+			#else
+			sunColor = getSunColor();
+			#endif
 			
 			//if(sun_direction.y < -0.)
 			//	sun_direction.y *= 5; //调整夜晚光线 temp version
@@ -399,6 +403,7 @@
 			CGPROGRAM
 			#pragma vertex vert_sky
 			#pragma fragment frag_sky
+			
 
 			#pragma exclude_renderers d3d11_9x
 			#pragma exclude_renderers d3d9
@@ -413,6 +418,7 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma  shader_feature _TAA_ON 
+			
 
 			#define ivec2 fixed2
 

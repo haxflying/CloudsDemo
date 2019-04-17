@@ -86,13 +86,7 @@
         float scale(float inCos)
         {
             float x = 1.0 - inCos;
-        #if defined(SHADER_API_N3DS)
-            // The polynomial expansion here generates too many swizzle instructions for the 3DS vertex assembler
-            // Approximate by removing x^1 and x^2
-            return 0.25 * exp(-0.00287 + x*x*x*(-6.80 + x*5.25));
-        #else
             return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));
-        #endif
         }
 
         // Calculates the Mie phase function
@@ -212,86 +206,26 @@
             #endif          
         }
 
-        void vert_bg_ground(float3 ray, inout v2f OUT)
+        uniform float sun_density;
+
+        float4 getSunColor()
         {
-            float3 kSkyTintInGammaSpace = COLOR_2_GAMMA(_SkyTint); // convert tint from Linear back to Gamma
-            float3 kScatteringWavelength = lerp (
-                kDefaultScatteringWavelength-kVariableRangeForScatteringWavelength,
-                kDefaultScatteringWavelength+kVariableRangeForScatteringWavelength,
-                half3(1,1,1) - kSkyTintInGammaSpace); // using Tint in sRGB gamma allows for more visually linear interpolation and to keep (.5) at (128, gray in sRGB) point
-            float3 kInvWavelength = 1.0 / pow(kScatteringWavelength, 4);
-
-            float kKrESun = kRAYLEIGH * kSUN_BRIGHTNESS;
+            float3 eyeRay = _WorldSpaceLightPos0.xyz;
+            float3 kInvWavelength = 1.0 / pow(kDefaultScatteringWavelength, 4);
             float kKr4PI = kRAYLEIGH * 4.0 * 3.14159265;
+            float kKrESun = kRAYLEIGH * sun_density;
 
-            float3 cameraPos = float3(0,kInnerRadius + kCameraHeight,0);    // The camera's current position
-
-            // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-            float3 eyeRay = ray;
-
-            float far = 0.0;
-            half3 cIn, cOut;
-
-            {
-                // Ground
-                far = (-kCameraHeight) / (min(-0.001, eyeRay.y));
-
-                float3 pos = cameraPos + far * eyeRay;
-
-                // Calculate the ray's starting position, then calculate its scattering offset
-                float depth = exp((-kCameraHeight) * (1.0/kScaleDepth));
-                float cameraAngle = dot(-eyeRay, pos);
-                float lightAngle = dot(_WorldSpaceLightPos0.xyz, pos);
-                float cameraScale = scale(cameraAngle);
-                float lightScale = scale(lightAngle);
-                float cameraOffset = depth*cameraScale;
-                float temp = (lightScale + cameraScale);
-
-                // Initialize the scattering loop variables
-                float sampleLength = far / kSamples;
-                float scaledLength = sampleLength * kScale;
-                float3 sampleRay = eyeRay * sampleLength;
-                float3 samplePoint = cameraPos + sampleRay * 0.5;
-
-                // Now loop through the sample rays
-                float3 frontColor = float3(0.0, 0.0, 0.0);
-                float3 attenuate;
-//              for(int i=0; i<int(kSamples); i++) // Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.
-                {
-                    float height = length(samplePoint);
-                    float depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-                    float scatter = depth*temp - cameraOffset;
-                    attenuate = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
-                    frontColor += attenuate * (depth * scaledLength);
-                    samplePoint += sampleRay;
-                }
-
-                cIn = frontColor * (kInvWavelength * kKrESun + kKmESun);
-                cOut = clamp(attenuate, 0.0, 1.0);
-            }
-
-            // if we want to calculate color in vprog:
-            // 1. in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)
-            // 2. in case of gamma and SKYBOX_COLOR_IN_TARGET_COLOR_SPACE: do sqrt right away instead of doing that in fshader
-
-            OUT.groundColor = _Exposure * (cIn + COLOR_2_LINEAR(_GroundColor) * cOut);
-
-            // The sun should have a stable intensity in its course in the sky. Moreover it should match the highlight of a purely specular material.
-            // This matching was done using the standard shader BRDF1 on the 5/31/2017
-            // Finally we want the sun to be always bright even in LDR thus the normalization of the lightColor for low intensity.
-            half lightColorIntensity = clamp(length(_LightColor0.xyz), 0.25, 1);
-
-            OUT.sunColor    = kHDSundiskIntensityFactor * saturate(cOut) * _LightColor0.xyz / lightColorIntensity;
-
-
-
-
-        #if defined(UNITY_COLORSPACE_GAMMA) && SKYBOX_COLOR_IN_TARGET_COLOR_SPACE
-            OUT.groundColor = sqrt(OUT.groundColor);
-            OUT.skyColor    = sqrt(OUT.skyColor);
-            OUT.sunColor= sqrt(OUT.sunColor);
-        #endif
-
+            float far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
+            float scaledLength = far * kScale;
+            float3 cameraPos = float3(0,kInnerRadius + kCameraHeight,0);
+            float height = kInnerRadius + kCameraHeight;
+            float depth = exp(kScaleOverScaleDepth * (-kCameraHeight)); //归一化后的光学厚度 exp(-4 * h / H)
+            float startAngle = dot(eyeRay, cameraPos) / height; //除以height用来给camerapos归一化
+            float startOffset = depth*scale(startAngle);//通过scale复原归一化，得到原始光学厚度
+            float3 attenuate = exp(-clamp(startOffset, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
+            fixed3 col = attenuate * (depth * scaledLength);
+            col *= kInvWavelength * kKrESun;
+            return fixed4(col, 1);
         }
 
 

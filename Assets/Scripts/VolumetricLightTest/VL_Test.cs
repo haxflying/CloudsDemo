@@ -6,8 +6,10 @@ public class VL_Test : MonoBehaviour {
 
     public Material mat;
 
-    [Range(0, 2f)]
+    [Range(0, 10f)]
     public float sun_density = 1f;
+    [Range(0, 5f)]
+    public float light_density = 2f;
     public bool debugVlight = false;
 
     [Range(1f, 4f)]
@@ -25,8 +27,11 @@ public class VL_Test : MonoBehaviour {
     {
         if(mat != null)
         {
+            float thickness = RenderSettings.skybox.GetFloat("_AtmosphereThickness");
             mat.SetVector("_MieG", new Vector4(1 - (MieG * MieG), 1 + (MieG * MieG), 2 * MieG, 1.0f / (4.0f * Mathf.PI)));
             mat.SetFloat("sun_density", sun_density);
+            mat.SetFloat("_AtmosphereThickness", thickness);
+            mat.SetFloat("light_density", light_density);
 
             int width = Mathf.FloorToInt((Screen.width / downSample));
             int height = Mathf.FloorToInt((Screen.height / downSample));

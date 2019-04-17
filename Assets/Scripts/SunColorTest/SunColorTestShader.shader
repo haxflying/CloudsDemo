@@ -45,9 +45,11 @@
 			float _CloudThickness;
 
 			#define kRAYLEIGH (lerp(0.0, 0.0025, pow(_CloudThickness,2.5)))      // Rayleigh constant
+			#define kMIE 0.0010   
 			#define kKrESun (kRAYLEIGH * sun_density)
 			#define OUTER_RADIUS 1.025
 			#define kMAX_SCATTER 50.0
+
 			static const float3 kDefaultScatteringWavelength = float3(.65, .57, .475);
 			static const float kInnerRadius = 1.0;
 			static const float kInnerRadius2 = 1.0;
@@ -56,6 +58,8 @@
 			static const float kCameraHeight = 0.0001;
 			static const float kScale = 1.0 / (OUTER_RADIUS - 1.0); //1 / H
 			static const float kScaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25; //4/H
+			static const float kKm4PI = kMIE * 4.0 * 3.14159265;
+
 
 			float scale(float inCos)
 			{
@@ -76,7 +80,7 @@
                 float depth = exp(kScaleOverScaleDepth * (-kCameraHeight)); //归一化后的光学厚度 exp(-4 * h / H)
                 float startAngle = dot(eyeRay, cameraPos) / height; //除以height用来给camerapos归一化
                 float startOffset = depth*scale(startAngle);//通过scale复原归一化，得到原始光学厚度
-                float3 attenuate = exp(-clamp(startOffset, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI));
+                float3 attenuate = exp(-clamp(startOffset, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
 				fixed3 col = attenuate * (depth * scaledLength);
 				col *= kInvWavelength * kKrESun;
 				return fixed4(col, 1);

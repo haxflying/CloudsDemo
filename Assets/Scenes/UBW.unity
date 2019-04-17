@@ -1374,7 +1374,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: fd24ff10831d48447ad76fe8f8c83a41, type: 2}
-  sun_density: 1
+  sun_density: 8
+  light_density: 2
   debugVlight: 0
   downSample: 4
   MieG: 0.6
