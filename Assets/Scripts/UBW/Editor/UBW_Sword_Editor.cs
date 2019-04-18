@@ -19,5 +19,7 @@ public class UBW_Sword_Editor : Editor {
         {
             ubw.scatter(num);
         }
+
+        
     }
 }

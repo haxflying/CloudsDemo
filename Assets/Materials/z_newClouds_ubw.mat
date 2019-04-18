@@ -47,17 +47,17 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AborbAmount: 0.96
+    - _AborbAmount: 0.539
     - _AtmosphereThickness: 1.66
     - _BackCloudDensity: 0.704
     - _CloudThickness: 2827
-    - _Coverage: 0.715
+    - _Coverage: 1
     - _Exposure: 0.65
     - _FadeDistance: 50000
     - _FadeRange: 10000
     - _FogDensity: 2.2
     - _FogDistance: 19.14
-    - _LayerBlend: 0.703
+    - _LayerBlend: 1
     - _OptimizationFactor: 0
     - _SUNLUT: 0
     - _Speed: 10

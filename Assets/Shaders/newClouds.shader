@@ -65,7 +65,7 @@
 	sampler2D _NoiseTex;
 	sampler3D _NoiseVolume;
 	float _LayerBlend;
-	float4 _currentFrame_TexelSize;				
+	float4 _currentFrame_TexelSize, _CameraRender_TexelSize, _prev_frame_TexelSize;				
 	float4 _NoiseTex_TexelSize;
 
 	sampler2D _LayerTex, _LayerTex1, _SunLut;
@@ -88,21 +88,7 @@
 
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
-	
-	v2f vert_sky (appdata v)
-	{
-		v2f o;
-		//o.vertex = UnityObjectToClipPos(v.vertex);
-		o.pos = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, 1);
-		o.uv = v.uv;
-		o.wpos = mul(unity_ObjectToWorld, v.vertex).xyz;
-		o.screenUV = ComputeScreenPos(o.pos);
-		o.ray = mul(unity_CameraInvProjection, float4((float2(v.uv.x, v.uv.y) - 0.5) * 2, -1, -1));
-
 		
-		return o;
-	}
-
 
 	float hash( vec2 p ) {
 	    return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);
@@ -325,24 +311,40 @@
 		fog = exp2(-fog);
 		return saturate(fog);
 	}
+
+	v2f vert_sky (appdata v)
+	{
+
+        //v.uv.y = 1-v.uv.y;
+		v2f o;
+		//o.vertex = UnityObjectToClipPos(v.vertex);
+		o.pos = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, 1);
+		o.uv = v.uv;
+		o.wpos = mul(unity_ObjectToWorld, v.vertex).xyz;
+		o.screenUV = ComputeScreenPos(o.pos);
+		o.ray = mul(unity_CameraInvProjection, float4((float2(v.uv.x, 1 - v.uv.y) - 0.5) * 2, -1, -1));
+
+		
+		return o;
+	}
 	
 	
 	fixed4 frag_sky (v2f i) : SV_Target
 	{
-		FragmentOutput o;
 
+		FragmentOutput o;
+		i.uv.y = 1 - i.uv.y;
 		i.screenUV.xy /= i.screenUV.w;
 		half3 col = 0;
 		fixed4 frame = tex2D(_CameraRender, i.uv);
-
 		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
 		float dpth = Linear01Depth(rawDepth);
 
 		i.ray *= (_ProjectionParams.z /i.ray.z);
+
 		float3 vpos = i.ray * dpth;
 		float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
 
-		
 
 		float3 org = _WorldSpaceCameraPos;
 		float3 dir = normalize(wpos - _WorldSpaceCameraPos);
@@ -432,15 +434,11 @@
 			{
 				v2f_taa o;
 				//o.vertex = UnityObjectToClipPos(v.vertex);
-				o.vertex = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, 1);
+				o.vertex = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, -1);
 				o.uv = v.uv;
 				return o;
 			}
-			
-			
-
-			
-
+									
 			vec3 RGBToYCoCg( vec3 RGB )
 			{
 				float Y = dot(RGB, vec3(  1, 2,  1 )) * 0.25;
@@ -495,7 +493,7 @@
 				#if _TAA_ON
 					return float4(YCoCgToRGB(lerp(current, history, 0.95)), currentFrame.a) ;
 				#else
-					return tex2D(_currentFrame, i.uv);
+					return tex2D(_prev_frame, i.uv);
 				#endif
 			}
 			ENDCG

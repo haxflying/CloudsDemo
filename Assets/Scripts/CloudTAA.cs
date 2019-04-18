@@ -16,6 +16,8 @@ public class CloudTAA : MonoBehaviour {
     [Range(1f, 4f)]
     public float downSample = 2f;
 
+
+
     public bool enableTimeLine = true;
 
     [Header("Material Property")]
@@ -65,6 +67,11 @@ public class CloudTAA : MonoBehaviour {
         }
     } 
     //private RenderTexture prev_frame, buffer;
+
+    public enum debugMode
+    {
+        cloudsPass, TAAPass, BlurPass, CombinePass, None
+    }
 
     private CommandBuffer cb;
     private Camera cam;
