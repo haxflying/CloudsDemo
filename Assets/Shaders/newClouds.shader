@@ -46,7 +46,7 @@
 	#define iTime _Time.y * _Speed
 	#define textureLod tex2Dlod	
 	#define EARTH_RADIUS 6300e3
-	#define CLOUD_START 1200.0
+	#define CLOUD_START 200.0
 	#define CLOUD_HEIGHT _CloudThickness
 	#define SUN_POWER 750.0
 	#define LOW_SCATTER vec3(1.0, 0.7, 0.5)
@@ -434,8 +434,9 @@
 			{
 				v2f_taa o;
 				//o.vertex = UnityObjectToClipPos(v.vertex);
-				o.vertex = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, -1);
+				o.vertex = v.vertex * float4(2, 2, 0, 0) + float4(0, 0, 0, 1);
 				o.uv = v.uv;
+				o.uv.y = 1 - o.uv.y;
 				return o;
 			}
 									
