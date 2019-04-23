@@ -15,6 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
+  - {fileID: 114477424915460492}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1430,6 +1431,45 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
+--- !u!114 &114477424915460492
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 8
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 4
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
 --- !u!114 &114667599240463256
 MonoBehaviour:
   m_ObjectHideFlags: 3

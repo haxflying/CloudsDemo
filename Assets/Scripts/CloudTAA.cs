@@ -185,16 +185,16 @@ public class CloudTAA : MonoBehaviour {
         }
 
         {
-            lightMat.SetTexture("_LayerTex", cloudsMat.GetTexture("_LayerTex"));
-            lightMat.SetTexture("_LayerTex1", cloudsMat.GetTexture("_LayerTex1"));
-            lightMat.SetTexture("_NoiseVolume", cloudsMat.GetTexture("_NoiseVolume"));
-            lightMat.SetFloat("_LayerBlend", cloudsMat.GetFloat("_LayerBlend"));
-            lightMat.SetFloat("_CloudThickness", cloudsMat.GetFloat("_CloudThickness"));
-            lightMat.SetFloat("_Coverage", cloudsMat.GetFloat("_Coverage"));
-            lightMat.SetFloat("_Speed", cloudsMat.GetFloat("_Speed"));
-            lightMat.SetFloat("_TextureDensity", cloudsMat.GetFloat("_TextureDensity"));
-            lightMat.SetVector("_Detail0", cloudsMat.GetVector("_Detail0"));
-            lightMat.SetVector("_Detail1", cloudsMat.GetVector("_Detail1"));
+            //lightMat.SetTexture("_LayerTex", cloudsMat.GetTexture("_LayerTex"));
+            //lightMat.SetTexture("_LayerTex1", cloudsMat.GetTexture("_LayerTex1"));
+            //lightMat.SetTexture("_NoiseVolume", cloudsMat.GetTexture("_NoiseVolume"));
+            //lightMat.SetFloat("_LayerBlend", cloudsMat.GetFloat("_LayerBlend"));
+            //lightMat.SetFloat("_CloudThickness", cloudsMat.GetFloat("_CloudThickness"));
+            //lightMat.SetFloat("_Coverage", cloudsMat.GetFloat("_Coverage"));
+            //lightMat.SetFloat("_Speed", cloudsMat.GetFloat("_Speed"));
+            //lightMat.SetFloat("_TextureDensity", cloudsMat.GetFloat("_TextureDensity"));
+            //lightMat.SetVector("_Detail0", cloudsMat.GetVector("_Detail0"));
+            //lightMat.SetVector("_Detail1", cloudsMat.GetVector("_Detail1"));
 
         }
     }

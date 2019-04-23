@@ -1524,10 +1524,8 @@ GameObject:
   - component: {fileID: 69623511}
   - component: {fileID: 69623510}
   - component: {fileID: 69623509}
-  - component: {fileID: 69623512}
   - component: {fileID: 69623513}
   - component: {fileID: 69623514}
-  - component: {fileID: 69623515}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1595,29 +1593,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &69623512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 69623508}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad54da7532622894990f1def8d5aad3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cloudsMat: {fileID: 2100000, guid: ffdd8e3ac90cc794fab585020840c917, type: 2}
-  blurMat: {fileID: 2100000, guid: 0400d2d68a5866a4fae06e8ad244b46d, type: 2}
-  lightMat: {fileID: 2100000, guid: fd24ff10831d48447ad76fe8f8c83a41, type: 2}
-  renderClouds: 1
-  useBlur: 1
-  cloudIteration: 60
-  bilateralBlurDiffScale: 5
-  downSample: 2
-  enableTimeLine: 0
-  coverage: 1
-  blendFactor: 0
-  textureDensity: 1
 --- !u!114 &69623513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1698,23 +1673,6 @@ MonoBehaviour:
   camSens: 0.25
   rotateOnlyIfMousedown: 1
   movementStaysFlat: 1
---- !u!114 &69623515
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 69623508}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9d9c911f99c7bd4a9a57961b6ae5843, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vl_mat: {fileID: 0}
-  sun_density: 8
-  light_density: 2
-  debugVlight: 0
-  downSample: 4
-  MieG: 0.6
 --- !u!1 &73175204
 GameObject:
   m_ObjectHideFlags: 0

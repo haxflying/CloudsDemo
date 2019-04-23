@@ -73,7 +73,7 @@ MonoBehaviour:
     value: 1
   debugClouds:
     overrideState: 1
-    value: 1
+    value: 0
   useBlur:
     overrideState: 1
     value: 1
@@ -100,10 +100,10 @@ MonoBehaviour:
     value: 10
   blendFactor:
     overrideState: 1
-    value: 0
+    value: 1
   coverage:
     overrideState: 1
-    value: 0.879
+    value: 1
   textureDensity:
     overrideState: 1
     value: 1
@@ -115,7 +115,7 @@ MonoBehaviour:
     value: 1121
   cloudThickness:
     overrideState: 1
-    value: 838
+    value: 2430
   detail0:
     overrideState: 1
     value: {x: 1, y: 1, z: 1, w: 8.76}

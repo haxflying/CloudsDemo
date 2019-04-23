@@ -316,7 +316,6 @@
 
 		const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
-
 		//half alpha = cosLookat < cosTangent ? 1 : 0;//smoothstep(0, 1,(_FadeDistance - distToAtmStart)/_FadeRange);
 		float3 fogCol = _FogColor.rgb;
 		float blendAlpha = 1;
