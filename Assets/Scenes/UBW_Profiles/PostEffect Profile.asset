@@ -15,7 +15,6 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
-  - {fileID: 114727814129199666}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -63,7 +62,7 @@ MonoBehaviour:
     value: 1
   coverage:
     overrideState: 1
-    value: 0.539
+    value: 0.65
   textureDensity:
     overrideState: 1
     value: 0.884
@@ -132,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
@@ -194,7 +193,7 @@ MonoBehaviour:
     value: -0.03
   contrast:
     overrideState: 1
-    value: 28.3
+    value: 23.4
   mixerRedOutRedIn:
     overrideState: 0
     value: 100
@@ -1431,6 +1430,45 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
+--- !u!114 &114667599240463256
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 8
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 3
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
 --- !u!114 &114727814129199666
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1470,6 +1508,45 @@ MonoBehaviour:
   bilateralBlurDiffScale:
     overrideState: 1
     value: 100
+--- !u!114 &114806036485387040
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 1
+  sun_density:
+    overrideState: 1
+    value: 8
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 3
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
 --- !u!114 &114960874774321334
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1481,7 +1558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f6f3f7c722b4544b97e3c75840aa33, type: 3}
   m_Name: AutoExposure
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
