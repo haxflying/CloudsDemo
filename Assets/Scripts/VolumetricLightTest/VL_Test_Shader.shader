@@ -231,7 +231,7 @@
 				
 
 		float3 lightDir = _WorldSpaceLightPos0.xyz;
-		int nbSample = 90;
+		int nbSample = 60;
 		
 		float stepSize = len / nbSample;
 
@@ -283,9 +283,10 @@
 		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
 	    float dpth = Linear01Depth(rawDepth);
 
-		fixed4 col = tex2D(_MainTex, i.uv);
-		fixed4 vlight = tex2D(vlight_Tex, i.uv);
+		float4 col = tex2D(_MainTex, i.uv);
+		float4 vlight = tex2D(vlight_Tex, i.uv);
 		vlight *= pow(dpth, 0.7);
+		return vlight;
 		col = vlight + (1 - Luminance(vlight.rgb)) * col;
 		//return vlight.r;
 		return col;

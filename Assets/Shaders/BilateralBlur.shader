@@ -113,6 +113,25 @@ Shader "Hidden/BilateralBlur"
 			return o;
 		}
 
+		float2 TransformTriangleVertexToUV(float2 vertex)
+		{
+			float2 uv = (vertex + 1.0) * 0.5;
+			return uv;
+		}
+
+		v2f vert_triangle(appdata v)
+		{
+			v2f o;
+			UNITY_INITIALIZE_OUTPUT(v2f, o);
+			o.vertex = float4(v.vertex.xy, 0, 1.0);
+			o.uv = TransformTriangleVertexToUV(v.vertex.xy);
+
+			#if UNITY_UV_STARTS_AT_TOP
+			o.uv = o.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
+			#endif
+			return o;
+		}
+
 		//-----------------------------------------------------------------------------------------
 		// vertDownsampleDepth
 		//-----------------------------------------------------------------------------------------
@@ -141,6 +160,24 @@ Shader "Hidden/BilateralBlur"
             o.uv = v.uv;
 
             o.uv00 = v.uv - 0.5 * texelSize.xy;
+            o.uv10 = o.uv00 + float2(texelSize.x, 0);
+            o.uv01 = o.uv00 + float2(0, texelSize.y);
+            o.uv11 = o.uv00 + texelSize.xy;
+            return o;
+        }
+
+        v2fUpsample vertUpsample_triangle(appdata v, float2 texelSize)
+        {
+            v2fUpsample o;
+            UNITY_INITIALIZE_OUTPUT(v2fUpsample, o);
+			o.vertex = float4(v.vertex.xy, 0, 1.0);
+			o.uv = TransformTriangleVertexToUV(v.vertex.xy);
+
+			#if UNITY_UV_STARTS_AT_TOP
+			o.uv = o.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
+			#endif
+
+            o.uv00 = o.uv - 0.5 * texelSize.xy;
             o.uv10 = o.uv00 + float2(texelSize.x, 0);
             o.uv01 = o.uv00 + float2(0, texelSize.y);
             o.uv11 = o.uv00 + texelSize.xy;
@@ -592,6 +629,63 @@ Shader "Hidden/BilateralBlur"
 			float frag(v2fDownsample input) : SV_Target
 			{
 				return DownsampleDepth(input, _HalfResDepthBuffer, sampler_HalfResDepthBuffer);
+			}
+
+			ENDCG
+		}
+
+		// pass 12 - bilateral upsample quarter to full
+		Pass
+		{
+			Name "12_triangle"
+			Blend One Zero
+
+			CGPROGRAM
+            #pragma vertex vertUpsampleToFull
+            #pragma fragment frag		
+            #pragma target 4.0
+
+			v2fUpsample vertUpsampleToFull(appdata v)
+			{
+                return vertUpsample_triangle(v, _QuarterResDepthBuffer_TexelSize);
+			}
+			float4 frag(v2fUpsample input) : SV_Target
+			{
+                return BilateralUpsample(input, _CameraDepthTexture, _QuarterResDepthBuffer, _QuarterResColor, sampler_QuarterResColor, sampler_QuarterResDepthBuffer);
+			}
+
+			ENDCG
+		}
+
+		// pass 13 - horizontal blur (quarter res)
+		Pass
+		{
+			Name "13_triangle"
+			CGPROGRAM
+            #pragma vertex vert_triangle
+            #pragma fragment horizontalFrag
+            #pragma target 4.0
+
+			fixed4 horizontalFrag(v2f input) : SV_Target
+			{
+                return BilateralBlur(input, int2(1, 0), _QuarterResDepthBuffer, sampler_QuarterResDepthBuffer, QUARTER_RES_BLUR_KERNEL_SIZE, _QuarterResDepthBuffer_TexelSize.xy);
+			}
+
+			ENDCG
+		}
+
+		// pass 14 - vertical blur (quarter res)
+		Pass
+		{
+			Name "14_triangle"
+			CGPROGRAM
+            #pragma vertex vert_triangle
+            #pragma fragment verticalFrag
+            #pragma target 4.0
+
+			fixed4 verticalFrag(v2f input) : SV_Target
+			{
+                return BilateralBlur(input, int2(0, 1), _QuarterResDepthBuffer, sampler_QuarterResDepthBuffer, QUARTER_RES_BLUR_KERNEL_SIZE, _QuarterResDepthBuffer_TexelSize.xy);
 			}
 
 			ENDCG
