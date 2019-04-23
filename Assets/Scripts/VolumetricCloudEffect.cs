@@ -102,18 +102,18 @@ public class VolumetricCloudEffectRender : PostProcessEffectRenderer<VolumetricC
         context.command.SetGlobalFloat("_LayerBlend", settings.blendFactor);
         context.command.SetGlobalFloat("_Coverage", settings.coverage);
         context.command.SetGlobalFloat("_TextureDensity", settings.textureDensity);
-        context.command.SetGlobalFloat("_Speed", settings.speed);
+        context.command.SetGlobalFloat("_Speed", settings.speed); 
         context.command.SetGlobalFloat("_CloudThickness", settings.cloudThickness);
+        context.command.SetGlobalFloat("_CloudStartHeight", settings.cloudStartHeight);
         context.command.SetGlobalVector("_Detail0", settings.detail0);
         context.command.SetGlobalVector("_Detail1", settings.detail1);
-        /***********common properties**************/
-
-        context.command.SetGlobalFloat("_BilateralBlurDiffScale", settings.bilateralBlurDiffScale);      
-        context.command.SetGlobalInt("_cloudIteration", settings.cloudIteration);
+        /***********common properties**************/      
 
         var cloudsSheet = context.propertySheets.Get(cloudsShader);
         var blurSheet = context.propertySheets.Get(blurShader);
 
+        blurSheet.properties.SetFloat("_BilateralBlurDiffScale", settings.bilateralBlurDiffScale);
+        cloudsSheet.properties.SetInt("_cloudIteration", settings.cloudIteration);
         cloudsSheet.properties.SetFloat("_cloudIteration", settings.cloudIteration);
         cloudsSheet.properties.SetFloat("_AtmosphereThickness", settings.atmosphereThickness);
         cloudsSheet.properties.SetFloat("_AborbAmount", settings.Absorption);
@@ -135,6 +135,7 @@ public class VolumetricCloudEffectRender : PostProcessEffectRenderer<VolumetricC
             if (settings.useBlur)
             {
                 context.command.BlitFullscreenTriangle(context.source, blurRes, cloudsSheet, 1); //TAA
+
                 context.command.BlitFullscreenTriangle(blurRes, temp_buffer, blurSheet, 13);
                 context.command.BlitFullscreenTriangle(temp_buffer, blurRes, blurSheet, 14); //Blur
 

@@ -16,7 +16,7 @@
 	#define iTime _Time.y * _Speed
 	#define textureLod tex2Dlod	
 	#define EARTH_RADIUS 6300e3
-	#define CLOUD_START 200.0
+	#define CLOUD_START _CloudStartHeight
 	#define CLOUD_HEIGHT _CloudThickness
 	#define SUN_POWER 750.0
 	#define LOW_SCATTER vec3(1.0, 0.7, 0.5)
@@ -48,13 +48,7 @@
 	float _Speed;
 	float4 _FogColor;
 	float _FogDensity, _FogDistance;
-	float _CloudThickness, _AborbAmount;
-	 
-	struct FragmentOutput
-    {
-        half4 dest0 : SV_Target0;
-        half4 dest1 : SV_Target1;
-    };
+	float _CloudThickness, _CloudStartHeight, _AborbAmount;	 
 
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
@@ -308,7 +302,6 @@
 	
 	fixed4 frag_sky (v2f i) : SV_Target
 	{
-		FragmentOutput o;
 		i.screenUV.xy /= i.screenUV.w;
 		half3 col = 0;
 		fixed4 frame = tex2D(_CameraRender, i.uv);

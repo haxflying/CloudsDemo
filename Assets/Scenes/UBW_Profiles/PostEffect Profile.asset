@@ -15,6 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
+  - {fileID: 114727814129199666}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -56,13 +57,13 @@ MonoBehaviour:
     value: 1.8
   sun_density:
     overrideState: 1
-    value: 6.83
+    value: 4.24
   blendFactor:
     overrideState: 1
     value: 1
   coverage:
     overrideState: 1
-    value: 0.801
+    value: 0.539
   textureDensity:
     overrideState: 1
     value: 0.884
@@ -71,7 +72,7 @@ MonoBehaviour:
     value: 1
   cloudStartHeight:
     overrideState: 1
-    value: 500
+    value: 386
   cloudThickness:
     overrideState: 1
     value: 1057
@@ -1430,6 +1431,45 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
+--- !u!114 &114727814129199666
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 10
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 3
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
 --- !u!114 &114960874774321334
 MonoBehaviour:
   m_ObjectHideFlags: 3
