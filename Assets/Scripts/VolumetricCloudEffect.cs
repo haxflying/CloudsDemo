@@ -11,6 +11,7 @@ public class VolumetricCloudEffect : PostProcessEffectSettings
 {
     public BoolParameter debugClouds = new BoolParameter { value = true };
     public BoolParameter useBlur = new BoolParameter { value = true };
+    //public BoolParameter controlSkyBoxHere = new BoolParameter { value = true };
 
     [Range(30, 150)]
     public IntParameter cloudIteration = new IntParameter { value = 90 };
@@ -120,7 +121,6 @@ public class VolumetricCloudEffectRender : PostProcessEffectRenderer<VolumetricC
         cloudsSheet.properties.SetFloat("sun_density", settings.sun_density);
         cloudsSheet.properties.SetColor("_AmbientColor", settings.AmbientColor);
 
-        //blurSheet.properties.set
 
         context.command.Blit(context.source, currentCamera);
 

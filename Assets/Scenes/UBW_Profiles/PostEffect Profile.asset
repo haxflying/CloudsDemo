@@ -15,7 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
-  - {fileID: 114477424915460492}
+  - {fileID: 114116618143801664}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -39,7 +39,7 @@ MonoBehaviour:
     value: 1
   cloudIteration:
     overrideState: 1
-    value: 90
+    value: 60
   bilateralBlurDiffScale:
     overrideState: 1
     value: 5
@@ -51,19 +51,19 @@ MonoBehaviour:
     value: {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
   Absorption:
     overrideState: 1
-    value: 0.54
+    value: 0.516
   atmosphereThickness:
     overrideState: 1
-    value: 1.8
+    value: 1.9
   sun_density:
     overrideState: 1
-    value: 4.24
+    value: 8.11
   blendFactor:
     overrideState: 1
     value: 1
   coverage:
     overrideState: 1
-    value: 0.65
+    value: 0.526
   textureDensity:
     overrideState: 1
     value: 0.884
@@ -72,10 +72,10 @@ MonoBehaviour:
     value: 1
   cloudStartHeight:
     overrideState: 1
-    value: 386
+    value: 100
   cloudThickness:
     overrideState: 1
-    value: 1057
+    value: 3000
   detail0:
     overrideState: 1
     value: {x: 1, y: 1, z: 1, w: 4.54}
@@ -94,6 +94,45 @@ MonoBehaviour:
     overrideState: 1
     value: {fileID: 11700000, guid: 2b9300a6c2cd4f94ab2130e260baf39b, type: 2}
     defaultState: 1
+--- !u!114 &114116618143801664
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 13.18
+  light_density:
+    overrideState: 1
+    value: 5
+  downSample:
+    overrideState: 1
+    value: 3
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
 --- !u!114 &114178893979466896
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -132,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1

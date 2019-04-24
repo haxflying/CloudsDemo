@@ -7,8 +7,9 @@ public class UBW_Sword : MonoBehaviour {
     public GameObject test;
     public List<GameObject> swords = new List<GameObject>();
     public Vector3 rotationRange;
+    public int num = 1000;
 
-    public void scatter(int num)
+    public void scatter()
     {
         Bounds bd = Terrain.activeTerrain.terrainData.bounds;
         Debug.Log(bd);

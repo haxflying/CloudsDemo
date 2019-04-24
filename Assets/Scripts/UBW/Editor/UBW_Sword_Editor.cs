@@ -6,7 +6,6 @@ using UnityEditor;
 [CustomEditor(typeof(UBW_Sword))]
 public class UBW_Sword_Editor : Editor {
 
-    int num_sword = 300;
 
     public override void OnInspectorGUI()
     {
@@ -14,10 +13,10 @@ public class UBW_Sword_Editor : Editor {
 
         var ubw = target as UBW_Sword;
        
-        int num  = EditorGUILayout.IntField("num of sword", num_sword);
+
         if(GUILayout.Button("Scatter"))
         {
-            ubw.scatter(num);
+            ubw.scatter();
         }
 
         

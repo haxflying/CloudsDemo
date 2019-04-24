@@ -235,7 +235,7 @@
 				
 
 		float3 lightDir = _WorldSpaceLightPos0.xyz;
-		int nbSample = 90;
+		int nbSample = 60;
 		
 		float stepSize = len / nbSample;
 

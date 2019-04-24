@@ -24,6 +24,9 @@ public class SwordAnim_Editor : Editor {
         if(GUILayout.Button("SetHeight"))
         {
             anim.SetHeight();
+            EditorUtility.SetDirty(anim.data);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
     }
 }

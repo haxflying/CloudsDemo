@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class SwordAnim : MonoBehaviour {
 
     public List<GameObject> normalSwords = new List<GameObject>();
@@ -92,8 +93,7 @@ public class SwordAnim : MonoBehaviour {
     private void Update()
     {
         if(m_process != process)
-        {
-            
+        {            
             m_process = process;
             for (int i = 0; i < transform.childCount; i++)
             {
