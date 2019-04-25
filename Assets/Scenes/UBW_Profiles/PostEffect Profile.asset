@@ -45,7 +45,7 @@ MonoBehaviour:
     value: 60
   bilateralBlurDiffScale:
     overrideState: 1
-    value: 5
+    value: 9
   downScale:
     overrideState: 1
     value: 2
@@ -54,7 +54,7 @@ MonoBehaviour:
     value: {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
   Absorption:
     overrideState: 1
-    value: 0.516
+    value: 0.713
   atmosphereThickness:
     overrideState: 1
     value: 1.9
@@ -63,13 +63,13 @@ MonoBehaviour:
     value: 8.11
   blendFactor:
     overrideState: 1
-    value: 0.592
+    value: 1
   coverage:
     overrideState: 1
-    value: 0.877
+    value: 0.922
   textureDensity:
     overrideState: 1
-    value: 1
+    value: 0.749
   speed:
     overrideState: 1
     value: 1.12
@@ -84,7 +84,7 @@ MonoBehaviour:
     value: {x: 1, y: 1, z: 1, w: 4.54}
   detail1:
     overrideState: 1
-    value: {x: 1, y: 1, z: 1, w: 7.5}
+    value: {x: 1, y: 1, z: 1, w: 9.21}
   layerTex0:
     overrideState: 1
     value: {fileID: 2800000, guid: 02c04ba61af10f74bbf349c420e59cc8, type: 3}
@@ -1694,7 +1694,7 @@ MonoBehaviour:
   active: 1
   enabled:
     overrideState: 1
-    value: 1
+    value: 0
   debugView:
     overrideState: 1
     value: 0
