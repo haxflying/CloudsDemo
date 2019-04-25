@@ -29,7 +29,9 @@
 	sampler2D _currentFrame;
 	sampler2D _prev_frame;
 	sampler2D _NoiseTex;
+	sampler2D _SpecialDepth;
 	sampler3D _NoiseVolume;
+
 	float _LayerBlend;
 	float4 _currentFrame_TexelSize, _CameraRender_TexelSize, _prev_frame_TexelSize;				
 	float4 _NoiseTex_TexelSize;
@@ -205,7 +207,7 @@
 	}
 
 	uniform int _cloudIteration; 
-	vec3 skyRay(vec3 org, vec3 dir, vec3 sun_direction, vec3 sunCol, vec3 skyCol, vec4 bgCol, out float blendAlpha, bool fast)
+	vec3 skyRay(vec3 org, vec3 dir, vec3 sun_direction, vec3 sunCol, vec3 skyCol, vec4 bgCol, float distToSpecial, out float blendAlpha, bool fast)
 	{
 	    const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		const float ATM_END = ATM_START+CLOUD_HEIGHT;
@@ -221,6 +223,7 @@
 	    float phaseFunction = numericalMieFit(mu);
 	    p += dir*stepS*hash(dot(dir, vec3(12.256, 2.646, 6.356)) + iTime);
 	    float thickness = 0;
+	    float2 test = float2(_ProjectionParams.z, 0);
 	    [loop]
 		for(int i=0; i<nbSample; i++)
 		{        
@@ -228,6 +231,11 @@
 			float density = clouds(p, cloudHeight, fast);
 			if(density>0.)
 			{
+				if(test.y == 0)
+				{
+					test.x = length(p - org);
+					test.y = 1;
+				}
 				thickness += density;
 				float intensity = lightRay(p, phaseFunction, density, mu, sun_direction, cloudHeight, fast);        
 	            vec3 ambient = (0.5 + 0.6*cloudHeight)*_AmbientColor.rgb*6.5 + (0.8) * max(0.0, 1.0-2.0*cloudHeight);
@@ -248,10 +256,9 @@
 	    //if(!fast) 	background += T*(1e4*smoothstep(0.9998, 1.0, mu)); //Draw Sun
 	    //color = color * sqrt(skyCol * 6) + background * T;
 	   	//return noise(p);
-	   	
-	   	blendAlpha = Luminance(color);
-	   	blendAlpha = max(blendAlpha, bgCol.a);
-	   	//return color;
+	   	blendAlpha = test.x / _ProjectionParams.z;
+	   	//blendAlpha = Luminance(color);
+	   	//blendAlpha = max(blendAlpha, bgCol.a);
 	    return color * sqrt(skyCol * 6)  * (1 - bgCol.a) + background * T;
 	}
 
@@ -307,12 +314,18 @@
 
 		i.ray *= (_ProjectionParams.z /i.ray.z);
 
+		rawDepth = SAMPLE_DEPTH_TEXTURE(_SpecialDepth, i.uv.xy);
+		float s_dpth = Linear01Depth(rawDepth);
+
 		float3 vpos = i.ray * dpth;
+		float3 s_vpos = i.ray * s_dpth;
 		float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
+		float dist = length(s_vpos);
 
 		float3 org = _WorldSpaceCameraPos;
-		float3 dir = normalize(wpos - _WorldSpaceCameraPos);
+		float3 dir = normalize(wpos - _WorldSpaceCameraPos);		
 		float3 sun_direction = _WorldSpaceLightPos0.xyz;
+
 
 		const float ATM_START = EARTH_RADIUS+CLOUD_START;
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
@@ -336,7 +349,7 @@
 			//	sun_direction.y *= 5; //调整夜晚光线 temp version
 			sun_direction = normalize(sun_direction);
 
-			col = skyRay(org, dir, sun_direction, sunColor, frame, frame, blendAlpha, false);
+			col = skyRay(org, dir, sun_direction, sunColor, frame, frame, dist, blendAlpha, false);
 			//tonemapping			 
 			  col = tonemapACES(col / 6.0);
 			//fogCol = tonemapACES(_FogColor.rgb * i.skyColor);
