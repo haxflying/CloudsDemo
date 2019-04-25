@@ -290,9 +290,9 @@ Shader "Hidden/BilateralBlur"
 			float4 centerColor = _MainTex.Sample(sampler_MainTex, uv);
 			
 
-			float3 color = centerColor.xyz;
+			float4 color = centerColor.xyzw;
 			//return float4(color, 1);
-			float centerDepth = centerColor.a;//Luminance(centerColor);//(LinearEyeDepth(depth.Sample(depthSampler, uv)));
+			float centerDepth = Luminance(centerColor);//(LinearEyeDepth(depth.Sample(depthSampler, uv)));
 			//return centerColor;
 			float weightSum = 0;
 
@@ -306,7 +306,7 @@ Shader "Hidden/BilateralBlur"
 			{
                 float2 offset = (direction * i);
                 float4 sampleColor = _MainTex.Sample(sampler_MainTex, input.uv, offset);
-                float sampleDepth = sampleColor.a;//Luminance(sampleColor);//(LinearEyeDepth(depth.Sample(depthSampler, input.uv, offset)));
+                float sampleDepth = Luminance(sampleColor);//(LinearEyeDepth(depth.Sample(depthSampler, input.uv, offset)));
 
 				float depthDiff = abs(centerDepth - sampleDepth) * scale;
                 float dFactor = depthDiff * BLUR_DEPTH_FACTOR;
@@ -323,7 +323,7 @@ Shader "Hidden/BilateralBlur"
 			{
 				float2 offset = (direction * i);
                 float4 sampleColor = _MainTex.Sample(sampler_MainTex, input.uv, offset);
-                float sampleDepth = sampleColor.a;//Luminance(sampleColor);//(LinearEyeDepth(depth.Sample(depthSampler, input.uv, offset)));
+                float sampleDepth = Luminance(sampleColor);//(LinearEyeDepth(depth.Sample(depthSampler, input.uv, offset)));
 
 				float depthDiff = abs(centerDepth - sampleDepth) * scale;
                 float dFactor = depthDiff * BLUR_DEPTH_FACTOR;
@@ -337,7 +337,7 @@ Shader "Hidden/BilateralBlur"
 			}
 
 			color /= weightSum;
-			return float4(color, centerColor.a);
+			return float4(color);
 		}
 
 		float4 BilateralBlur2(v2f input, int2 direction, Texture2D depth, SamplerState depthSampler, const int kernelRadius, float2 pixelSize)

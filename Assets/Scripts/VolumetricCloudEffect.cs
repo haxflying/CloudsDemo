@@ -139,7 +139,7 @@ public class VolumetricCloudEffectRender : PostProcessEffectRenderer<VolumetricC
                 context.command.BlitFullscreenTriangle(blurRes, temp_buffer, blurSheet, 13);
                 context.command.BlitFullscreenTriangle(temp_buffer, blurRes, blurSheet, 14); //Blur
 
-                context.command.BlitFullscreenTriangle(blurRes, cloudsFrame, blurSheet, 12); //upsample
+                context.command.Blit(blurRes, cloudsFrame); //upsample
             }
             else
             {

@@ -88,7 +88,7 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
 
         context.command.BlitFullscreenTriangle(blur_res, taa_res, vlSheet, 2); //taa
 
-        context.command.BlitFullscreenTriangle(blur_res, downSampleBuffer, blurSheet, 12);//Upsample
+        context.command.Blit(blur_res, downSampleBuffer);//Upsample
 
         if (settings.debugView)
         {                     
