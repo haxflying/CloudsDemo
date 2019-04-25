@@ -53,6 +53,9 @@
 	float4 _MieG;
 	float4 _LightColor0;
 
+	float _traceDistance;
+	int _traceIteration;
+
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 
 	float4 _Detail0, _Detail1;
@@ -235,7 +238,7 @@
 				
 
 		float3 lightDir = _WorldSpaceLightPos0.xyz;
-		int nbSample = 60;
+		int nbSample = _traceIteration;
 		
 		float stepSize = len / nbSample;
 
@@ -243,7 +246,7 @@
 		float cosAngle = dot(lightDir, -dir);
 		float4 vlight = 0;
 		float3 p = o;
-		p += dir * stepSize * hash(dot(p, float3(12.256, 2.646, 6.356)) + _Time.y) * 0.1;
+		p += dir * stepSize * hash(dot(p, float3(12.256, 2.646, 6.356)) + _Time.y) * 0.01;
 		float density = light_density;
 
 		[loop]
@@ -276,7 +279,7 @@
 	    float dpth = Linear01Depth(rawDepth);
 	    float3 vpos = i.ray * dpth;
 	   	float dist = length(vpos);
-	    float4 vlight = rayTrace(_WorldSpaceCameraPos, normalize(ray), _ProjectionParams.z);
+	    float4 vlight = rayTrace(_WorldSpaceCameraPos, normalize(ray), _traceDistance);
 	    
 	    return vlight;
 	   	return float4(vlight.rgb, dpth);

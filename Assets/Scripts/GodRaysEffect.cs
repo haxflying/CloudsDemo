@@ -17,7 +17,10 @@ public class GodRays : PostProcessEffectSettings {
     public FloatParameter light_density = new FloatParameter { value = 2f };
     [Range(1, 4)]
     public IntParameter downSample = new IntParameter { value = 4 };
-   
+    [Range(30, 150)]
+    public IntParameter iteration = new IntParameter { value = 60 };
+    [Min(300f)]
+    public FloatParameter traceDistance = new FloatParameter { value = 1000f };
 
     [Header("Shading")]
     [Range(0f, 0.99f)]
@@ -27,7 +30,7 @@ public class GodRays : PostProcessEffectSettings {
     [Range(0f, 1f)]
     public FloatParameter ExtinctionCoef = new FloatParameter { value = 0.003f };
     [Range(1f, 100f)]
-    public FloatParameter bilateralBlurDiffScale = new FloatParameter { value = 20f };
+    public FloatParameter bilateralBlurDiffScale = new FloatParameter { value = 100f };
 }
 
 public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
@@ -67,6 +70,8 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
         vlSheet.properties.SetFloat("_AtmosphereThickness", thickness);
         vlSheet.properties.SetFloat("_ScatteringCoef", settings.ScaterringCoef);
         vlSheet.properties.SetFloat("_ExtinctionCoef", settings.ExtinctionCoef);
+        vlSheet.properties.SetFloat("_traceDistance", settings.traceDistance);
+        vlSheet.properties.SetInt("_traceIteration", settings.iteration);
         blurSheet.properties.SetFloat("_BilateralBlurDiffScale", settings.bilateralBlurDiffScale);
 
 

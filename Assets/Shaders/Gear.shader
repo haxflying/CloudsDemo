@@ -21,7 +21,7 @@
 
 		sampler2D _MainTex;
 		sampler2D _NormalMap;
-		sampler2D _clouds_frame;
+		sampler2D alpha_mask;
 		sampler2D _SpecialDepth;
 
 		struct Input {
@@ -44,7 +44,7 @@
         {
           //color = float4(IN.screenPos.xy / IN.screenPos.w, 0, 1);
         	float2 uv = IN.screenPos.xy / IN.screenPos.w;
-      		float distToClouds = tex2D(_clouds_frame, uv).a;
+      		float distToClouds = tex2D(alpha_mask, uv).a;
 			float distToMe = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_SpecialDepth, uv));
 			//color = distToClouds;
 			//color = distToMe;
@@ -63,10 +63,10 @@
 			o.Normal = UnpackNormal(tex2D(_NormalMap, IN.uv_MainTex));
 
 			float2 uv = IN.screenPos.xy / IN.screenPos.w;
-			float distToClouds = tex2D(_clouds_frame, uv).a;
+			float distToClouds = tex2D(alpha_mask, uv).r;
 			//distToClouds = distToClouds > 0.99 ? 0 : distToClouds;
 			float distToMe = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_SpecialDepth, uv));
-			o.Alpha = saturate(saturate(distToClouds - distToMe) * 100);
+			o.Alpha = saturate(saturate(distToClouds - distToMe) * 50);
 		}
 		ENDCG
 	}

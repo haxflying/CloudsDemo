@@ -15,7 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
-  - {fileID: 114435274622798002}
+  - {fileID: 114939480863289054}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -35,6 +35,9 @@ MonoBehaviour:
     overrideState: 1
     value: 0
   useBlur:
+    overrideState: 1
+    value: 1
+  exportAlpha:
     overrideState: 1
     value: 1
   cloudIteration:
@@ -60,10 +63,10 @@ MonoBehaviour:
     value: 8.11
   blendFactor:
     overrideState: 1
-    value: 0.481
+    value: 0.592
   coverage:
     overrideState: 1
-    value: 1
+    value: 0.877
   textureDensity:
     overrideState: 1
     value: 1
@@ -94,6 +97,18 @@ MonoBehaviour:
     overrideState: 1
     value: {fileID: 11700000, guid: 2b9300a6c2cd4f94ab2130e260baf39b, type: 2}
     defaultState: 1
+  alphaDownScale:
+    overrideState: 1
+    value: 4
+  alphaBlurIteration:
+    overrideState: 1
+    value: 4
+  alphaBlurSpread:
+    overrideState: 1
+    value: 1.87
+  useTAA:
+    overrideState: 1
+    value: 0
 --- !u!114 &114116618143801664
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -210,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
@@ -251,10 +266,10 @@ MonoBehaviour:
     value: 1
   temperature:
     overrideState: 1
-    value: 31.4
+    value: 5.9
   tint:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 14.8
   colorFilter:
     overrideState: 0
     value: {r: 1, g: 1, b: 1, a: 1}
@@ -272,7 +287,7 @@ MonoBehaviour:
     value: -0.03
   contrast:
     overrideState: 1
-    value: 23.4
+    value: 8.7
   mixerRedOutRedIn:
     overrideState: 0
     value: 100
@@ -302,7 +317,7 @@ MonoBehaviour:
     value: 100
   lift:
     overrideState: 1
-    value: {x: 1, y: 0.9066428, z: 0.7726474, w: 0}
+    value: {x: 0.9849771, y: 1, z: 0.893934, w: 0}
   gamma:
     overrideState: 0
     value: {x: 0.99817735, y: 0.99054366, z: 1, w: 0}
@@ -1653,6 +1668,51 @@ MonoBehaviour:
   downSample:
     overrideState: 1
     value: 3
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
+--- !u!114 &114939480863289054
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 10.12
+  light_density:
+    overrideState: 1
+    value: 0.62
+  downSample:
+    overrideState: 1
+    value: 3
+  iteration:
+    overrideState: 1
+    value: 90
+  traceDistance:
+    overrideState: 1
+    value: 1500
   MieG:
     overrideState: 1
     value: 0.6

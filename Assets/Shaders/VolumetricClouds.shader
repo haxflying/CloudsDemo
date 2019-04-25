@@ -517,5 +517,108 @@
 			ENDCG
 		}
 
+		Pass
+		{
+			Name "getAlpha"
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			struct v2f_taa
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
+
+			v2f_taa vert (appdata v)
+			{
+				v2f_taa o;
+				UNITY_INITIALIZE_OUTPUT(v2f_taa, o);
+				o.vertex = float4(v.vertex.xy, 0, 1.0);
+				o.uv = TransformTriangleVertexToUV(v.vertex.xy);
+
+				#if UNITY_UV_STARTS_AT_TOP
+				o.uv = o.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
+				#endif
+				return o;
+			}
+
+			fixed4 frag (v2f_taa i) : SV_Target
+			{
+				half alpha = tex2D(_MainTex, i.uv).a;
+				float dx = ddx(alpha), dy = ddy(alpha);
+				return tex2D(_MainTex, i.uv, dx, dy).a;
+				
+			}
+			ENDCG
+		}
+
+		Pass
+		{
+			Name "singleChannel TAA"
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#define ivec2 fixed2
+
+			struct v2f_taa
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
+
+			v2f_taa vert (appdata v)
+			{
+				v2f_taa o;
+				UNITY_INITIALIZE_OUTPUT(v2f_taa, o);
+				o.vertex = float4(v.vertex.xy, 0, 1.0);
+				o.uv = TransformTriangleVertexToUV(v.vertex.xy);
+
+				#if UNITY_UV_STARTS_AT_TOP
+				o.uv = o.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
+				#endif
+				return o;
+			}		
+
+			sampler2D alpha_mask;
+			float4 _MainTex_TexelSize;							
+			
+			fixed4 frag (v2f_taa i) : SV_Target
+			{
+				vec2 offsets[8] = { 
+				vec2(-1,-1), vec2(-1, 1), 
+				vec2(1, -1), vec2(1, 1), 
+				vec2(1, 0),  vec2(0, -1), 
+				vec2(0, 1),  vec2(-1, 0)};
+
+				//return tex2D(_prev_frame, i.uv);
+				float currentFrame = tex2D(_MainTex, i.uv).r;
+				float current = (currentFrame.r);
+				float history = (tex2D(alpha_mask, i.uv)).r;
+
+				float colorAvg = current;
+				float colorVar = current * current;
+
+				// Marco Salvi's Implementation (by Chris Wyman)
+				for (int j = 0; j < 8; ++j)
+				{
+					float fetch = (tex2D(_MainTex, i.uv + offsets[j] * _MainTex_TexelSize.xy).rgb);
+					colorAvg += fetch;
+					colorVar += fetch * fetch;
+				}
+
+				colorAvg /= 9.0;
+				colorVar /= 9.0;
+				float gColorBoxSigma = 0.75;
+				float sigma = sqrt(max(0, colorVar - colorAvg * colorAvg));
+				float colorMin = colorAvg - gColorBoxSigma * sigma;
+				float colorMax = colorAvg + gColorBoxSigma * sigma;
+				
+				history = clamp(history, colorMin, colorMax);
+				return (lerp(current, history, 0.95)) ;
+			}
+			ENDCG
+		}
+
 	}
 }
