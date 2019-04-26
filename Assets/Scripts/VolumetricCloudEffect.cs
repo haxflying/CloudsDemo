@@ -10,8 +10,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class VolumetricCloudEffect : PostProcessEffectSettings
 {
     public BoolParameter debugClouds = new BoolParameter { value = true };
-    public BoolParameter useBlur = new BoolParameter { value = true };
-    public BoolParameter exportAlpha = new BoolParameter { value = true };
+    public BoolParameter useBlur = new BoolParameter { value = true };   
 
     [Range(30, 150)]
     public IntParameter cloudIteration = new IntParameter { value = 90 };
@@ -58,6 +57,7 @@ public class VolumetricCloudEffect : PostProcessEffectSettings
     public TextureParameter noiseVolume = new TextureParameter { };
 
     [Header("Alpha Mask")]
+    public BoolParameter exportAlpha = new BoolParameter { value = true };
     [Range(1f, 4f)]
     public FloatParameter alphaDownScale = new FloatParameter { value = 2f };
     [Range(0, 4)]

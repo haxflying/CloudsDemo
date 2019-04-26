@@ -15,7 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
-  - {fileID: 114939480863289054}
+  - {fileID: 114317812828423694}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -37,9 +37,6 @@ MonoBehaviour:
   useBlur:
     overrideState: 1
     value: 1
-  exportAlpha:
-    overrideState: 1
-    value: 1
   cloudIteration:
     overrideState: 1
     value: 60
@@ -51,7 +48,7 @@ MonoBehaviour:
     value: 2
   AmbientColor:
     overrideState: 1
-    value: {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
+    value: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
   Absorption:
     overrideState: 1
     value: 0.713
@@ -66,10 +63,10 @@ MonoBehaviour:
     value: 1
   coverage:
     overrideState: 1
-    value: 0.922
+    value: 0.776
   textureDensity:
     overrideState: 1
-    value: 0.749
+    value: 0.851
   speed:
     overrideState: 1
     value: 1.12
@@ -97,6 +94,9 @@ MonoBehaviour:
     overrideState: 1
     value: {fileID: 11700000, guid: 2b9300a6c2cd4f94ab2130e260baf39b, type: 2}
     defaultState: 1
+  exportAlpha:
+    overrideState: 1
+    value: 1
   alphaDownScale:
     overrideState: 1
     value: 4
@@ -175,6 +175,57 @@ MonoBehaviour:
   MieG:
     overrideState: 0
     value: 0.6
+--- !u!114 &114317812828423694
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 8
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 3
+  iteration:
+    overrideState: 1
+    value: 60
+  traceDistance:
+    overrideState: 1
+    value: 1000
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
+  lightIteration:
+    overrideState: 1
+    value: 5
+  shadowIteration:
+    overrideState: 1
+    value: 15
 --- !u!114 &114435274622798002
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -284,7 +335,7 @@ MonoBehaviour:
     value: 0
   postExposure:
     overrideState: 1
-    value: -0.03
+    value: 0.27
   contrast:
     overrideState: 1
     value: 8.7

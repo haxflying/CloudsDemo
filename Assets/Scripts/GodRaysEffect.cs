@@ -31,6 +31,10 @@ public class GodRays : PostProcessEffectSettings {
     public FloatParameter ExtinctionCoef = new FloatParameter { value = 0.003f };
     [Range(1f, 100f)]
     public FloatParameter bilateralBlurDiffScale = new FloatParameter { value = 100f };
+    [Range(1, 10)]
+    public IntParameter lightIteration = new IntParameter { value = 5 };
+    [Range(5, 30)]
+    public IntParameter shadowIteration = new IntParameter { value = 15 };   
 }
 
 public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
@@ -72,6 +76,8 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
         vlSheet.properties.SetFloat("_ExtinctionCoef", settings.ExtinctionCoef);
         vlSheet.properties.SetFloat("_traceDistance", settings.traceDistance);
         vlSheet.properties.SetInt("_traceIteration", settings.iteration);
+        vlSheet.properties.SetInt("_lightIteration", settings.lightIteration);
+        vlSheet.properties.SetInt("_shadowIteration", settings.shadowIteration);
         blurSheet.properties.SetFloat("_BilateralBlurDiffScale", settings.bilateralBlurDiffScale);
 
 
@@ -103,7 +109,6 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
         {           
             context.command.BlitFullscreenTriangle(context.source, context.destination, vlSheet, 1);
         }
-
         context.command.Blit(downSampleBuffer, prev_frame);
     }
 }

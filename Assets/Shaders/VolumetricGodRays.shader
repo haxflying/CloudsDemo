@@ -161,6 +161,8 @@
 	float _AtmosphereThickness;
 	float sun_density;
 	float light_density;
+	int _lightIteration;
+	int _shadowIteration;
 
 	#define kRAYLEIGH (lerp(0.0, 0.0025, pow(_AtmosphereThickness,2.5)))      // Rayleigh constant
 	#define kMIE 0.0010   
@@ -203,12 +205,12 @@
 		return fixed4(col, 1);
 	}
 
-	float getAttenuation(float3 p, float3 lightDir)
+	float getAttenuation(float3 p, float3 lightDir, int nlSample)
 	{
 		const float START = EARTH_RADIUS + CLOUD_START;	
 		float END = START + _CloudThickness;	
 
-		int nlSample = 6;
+		//int nlSample = 6;
 		float distToStart = intersectSphere(p, lightDir, float3(0, -EARTH_RADIUS, 0), START);
 		float distToEnd = intersectSphere(p, lightDir, float3(0, -EARTH_RADIUS, 0), END);
 		float stepSize = (distToEnd - distToStart) / (float)nlSample;
@@ -230,7 +232,6 @@
 		//atten /= (float)nlSample;
 		//atten *= tex2D(_MaskTex, p.xz * 0.0005);
 		return min(0.6, saturate(1 - atten * 20));
-		return min(0.8, 1 - saturate(atten));
 	}
 
 	float4 rayTrace(float3 o, float3 dir, float len)
@@ -252,7 +253,7 @@
 		[loop]
 		for (int i = 0; i < nbSample; ++i)
 		{					
-			float atten = getAttenuation(p, lightDir);
+			float atten = getAttenuation(p, lightDir, _lightIteration);
 						
 			float scattering = _ScatteringCoef * stepSize * density;
 			extinction += _ExtinctionCoef * stepSize * density;
@@ -269,6 +270,13 @@
 		return vlight;
 	}
 
+	fixed getShadowMap(float3 wpos)
+	{
+		float3 lightDir = _WorldSpaceLightPos0.xyz;
+		float atten = getAttenuation(wpos, lightDir, _shadowIteration);
+		return atten;
+	}
+
 	fixed4 frag_vlight (v2f i) : SV_Target
 	{
 		
@@ -278,22 +286,33 @@
 		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
 	    float dpth = Linear01Depth(rawDepth);
 	    float3 vpos = i.ray * dpth;
-	   	float dist = length(vpos);
+ 		float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
+
 	    float4 vlight = rayTrace(_WorldSpaceCameraPos, normalize(ray), _traceDistance);
-	    
+	    //float shadow = getShadowMap(wpos);
+	    //if(dpth > 0.99)
+	    //	shadow = 0;
 	    return vlight;
-	   	return float4(vlight.rgb, dpth);
+	   	//return float4(vlight.rgb, shadow);
 	}
 
 	sampler2D vlight_Tex;
 	fixed4 frag_combine (v2f i) : SV_Target
 	{
+		i.ray *= (_ProjectionParams.z / i.ray.z);
 		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
 	    float dpth = Linear01Depth(rawDepth);
+	    float3 vpos = i.ray * dpth;
+	    float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1));
 
 		float4 col = tex2D(_MainTex, i.uv);
 		float4 vlight = tex2D(vlight_Tex, i.uv);
-		vlight *= pow(dpth, 0.7);
+		vlight.rgb *= pow(dpth, 0.7);
+		float shadow = getShadowMap(wpos);
+	    if(dpth > 0.99)
+	    	shadow = 0;
+		//float shadow = vlight.a;
+		col *=  saturate(shadow + 0.6);
 		col = vlight + (1 - Luminance(vlight.rgb)) * col;
 		//return vlight.r;
 		return col;

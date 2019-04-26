@@ -14,12 +14,15 @@
 		#pragma surface surf Standard vertex:SplatmapVert fullforwardshadows
 
 		// Use shader model 3.0 target, to get nicer looking lighting
-		#pragma target 3.0
+		#pragma target 3.0 
+
+		#define UNITY_LIGHT_ATTENUATION(destName, input, wpos) fixed destName = max(0.6, UNITY_SHADOW_ATTENUATION(input, worldPos));
 
 		sampler2D _Splat0, _Normal0;
 
 		struct Input {
 			float2 uv_Splat0;
+			float4 screenPos;
 		};
 
 		half _Smoothness0;
@@ -32,6 +35,7 @@
 		UNITY_INSTANCING_BUFFER_START(Props)
 			// put more per-instance properties here
 		UNITY_INSTANCING_BUFFER_END(Props)
+
 
 		float sum(float3 v)
 		{
@@ -46,6 +50,7 @@
 		    v.tangent.xyz = cross(v.normal, float3(0,0,1));
 		    v.tangent.w = -1;
 		}
+
 
 		float4 hash4(float2 p)
 		{
