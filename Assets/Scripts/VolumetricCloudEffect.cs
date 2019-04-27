@@ -20,8 +20,9 @@ public class VolumetricCloudEffect : PostProcessEffectSettings
     public FloatParameter downScale = new FloatParameter { value = 2f };
 
 
-    [Header("Material Property")]
     [Header("Light")]
+    [Range(0f, 0.99f)]
+    public FloatParameter MieG = new FloatParameter { value = 0.6f };
     public ColorParameter AmbientColor = new ColorParameter { value = Color.white };
     [Range(0f, 1f)]
     public FloatParameter Absorption = new FloatParameter { value = 0.6f };
@@ -134,6 +135,9 @@ public class VolumetricCloudEffectRender : PostProcessEffectRenderer<VolumetricC
         var g_blurSheet = context.propertySheets.Get(g_blurShader);
 
         b_blurSheet.properties.SetFloat("_BilateralBlurDiffScale", settings.bilateralBlurDiffScale);
+
+        float MieG = settings.MieG;
+        cloudsSheet.properties.SetVector("_MieG", new Vector4(1 - (MieG * MieG), 1 + (MieG * MieG), 2 * MieG, 1.0f / (4.0f * Mathf.PI)));
         cloudsSheet.properties.SetInt("_cloudIteration", settings.cloudIteration);
         cloudsSheet.properties.SetFloat("_cloudIteration", settings.cloudIteration);
         cloudsSheet.properties.SetFloat("_AtmosphereThickness", settings.atmosphereThickness);

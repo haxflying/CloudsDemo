@@ -46,7 +46,8 @@
 	float _Speed;
 	float4 _FogColor;
 	float _FogDensity, _FogDistance;
-	float _CloudThickness, _CloudStartHeight, _AborbAmount;	 
+	float _CloudThickness, _CloudStartHeight, _AborbAmount;	
+	float4 _MieG; 
 
 
 	UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
@@ -117,8 +118,12 @@
 	    return (t0 < 0.0) ? t1 : t0;
 	}
 
+	float numericalMieFit(float cosAngle, float4 g)
+	{
+        return g.w * (g.x / (pow(g.y - g.z * cosAngle, 1.5)));			
+	}
 	// From https://www.shadertoy.com/view/4sjBDG
-	float numericalMieFit(float costh)
+	float numericalMieFit1(float costh)
 	{
 	    // This function was optimized to minimize (delta*delta)/reference in order to capture
 	    // the low intensity behavior.
@@ -214,13 +219,27 @@
 	    
 	    int nbSample = fast ? 13 : _cloudIteration;
 	    vec3 color = 0;
+	    
 		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
 	    float distToAtmEnd = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_END);
+	    //TODO:Add above clouds view angle support
+	    /*
+	    float camheight = length(org - vec3(0.0, -EARTH_RADIUS, 0.0));	    
+	    if(camheight > ATM_END)
+	    {
+	    	int temp = distToAtmStart;
+	    	distToAtmStart = distToAtmEnd;
+	    	distToAtmEnd = temp;
+	    }
+	    else if(camheight > ATM_START)
+	    {
+	    	distToAtmStart = 0;
+	    }*/
 	    vec3 p = org + distToAtmStart * dir;    
 	    float stepS = (distToAtmEnd-distToAtmStart) / float(nbSample);    
 	    float T = 1.;    
 	    float mu = dot(sun_direction, dir);
-	    float phaseFunction = numericalMieFit(mu);
+	    float phaseFunction = numericalMieFit(mu, _MieG);
 	    p += dir*stepS*hash(dot(dir, vec3(12.256, 2.646, 6.356)) + iTime);
 	    float thickness = 0;
 	    float2 test = float2(_ProjectionParams.z, 0);
@@ -327,14 +346,14 @@
 		float3 sun_direction = _WorldSpaceLightPos0.xyz;
 
 
-		const float ATM_START = EARTH_RADIUS+CLOUD_START;
-		float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
+		//const float ATM_START = EARTH_RADIUS+CLOUD_START;
+		//float distToAtmStart = intersectSphere(org, dir, vec3(0.0, -EARTH_RADIUS, 0.0), ATM_START);
 		//half alpha = cosLookat < cosTangent ? 1 : 0;//smoothstep(0, 1,(_FadeDistance - distToAtmStart)/_FadeRange);
 		float3 fogCol = _FogColor.rgb;
 		float blendAlpha = 1;
-		if(dir.y < -0.1)
-			col = 0;		
-		else
+		//if(dir.y < -0.1)
+		//	col = 0;		
+		//else
 		{
 			//cloud render
 			float lerpFactor = saturate(1 - saturate(sun_direction.y));
@@ -359,8 +378,8 @@
 
 		//float fog = ComputeFogFactor((length(wpos - _WorldSpaceCameraPos) - distToAtmStart)/(-_FogDistance * 1000));		
 		//finalCol = lerp(finalCol, fogCol, 1 - fog);	
+
 		finalCol = lerp(float4(frame.rgb, 1), finalCol, saturate(dir.y * 10 - 0.3));
-		//return blendAlpha;
 		return float4(finalCol.rgb, blendAlpha);
 	}
 	

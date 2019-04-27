@@ -15,7 +15,7 @@ MonoBehaviour:
   - {fileID: 114960874774321334}
   - {fileID: 114449865766433652}
   - {fileID: 114101690755958454}
-  - {fileID: 114317812828423694}
+  - {fileID: 114884020904665574}
 --- !u!114 &114101690755958454
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -46,6 +46,9 @@ MonoBehaviour:
   downScale:
     overrideState: 1
     value: 2
+  MieG:
+    overrideState: 1
+    value: 0.698
   AmbientColor:
     overrideState: 1
     value: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
@@ -60,10 +63,10 @@ MonoBehaviour:
     value: 8.11
   blendFactor:
     overrideState: 1
-    value: 1
+    value: 0.71
   coverage:
     overrideState: 1
-    value: 0.776
+    value: 0.859
   textureDensity:
     overrideState: 1
     value: 0.851
@@ -102,7 +105,7 @@ MonoBehaviour:
     value: 4
   alphaBlurIteration:
     overrideState: 1
-    value: 4
+    value: 3
   alphaBlurSpread:
     overrideState: 1
     value: 1.87
@@ -1731,6 +1734,57 @@ MonoBehaviour:
   bilateralBlurDiffScale:
     overrideState: 1
     value: 100
+--- !u!114 &114884020904665574
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 1
+    value: 0
+  sun_density:
+    overrideState: 1
+    value: 8
+  light_density:
+    overrideState: 1
+    value: 2
+  downSample:
+    overrideState: 1
+    value: 4
+  iteration:
+    overrideState: 1
+    value: 60
+  traceDistance:
+    overrideState: 1
+    value: 1000
+  MieG:
+    overrideState: 1
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 1
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 1
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 100
+  lightIteration:
+    overrideState: 1
+    value: 5
+  shadowIteration:
+    overrideState: 1
+    value: 15
 --- !u!114 &114939480863289054
 MonoBehaviour:
   m_ObjectHideFlags: 3

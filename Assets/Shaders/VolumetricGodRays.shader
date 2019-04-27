@@ -234,6 +234,35 @@
 		return min(0.6, saturate(1 - atten * 20));
 	}
 
+	float getShadowAttenuation(float3 p, float3 lightDir, int nlSample)
+	{
+		const float START = EARTH_RADIUS + CLOUD_START;	
+		float END = START + _CloudThickness;	
+
+		//int nlSample = 6;
+		float distToStart = intersectSphere(p, lightDir, float3(0, -EARTH_RADIUS, 0), START);
+		float distToEnd = intersectSphere(p, lightDir, float3(0, -EARTH_RADIUS, 0), END);
+		float stepSize = (distToEnd - distToStart) / (float)nlSample;
+		p += lightDir * distToStart;
+		p += lightDir * stepSize * hash(dot(p, float3(12.256, 2.646, 6.356)) + _Time.y) * 0.01;
+
+		float cloudHeight = 0;
+		float atten = 0;
+		
+		[loop]
+		for (int i = 0; i < nlSample; ++i)
+		{
+			float density = clouds(p, cloudHeight, false);
+			
+			//density = 0;
+			atten += density;
+			p += stepSize * lightDir;
+		}
+		atten /= (float)nlSample;
+		//atten *= tex2D(_MaskTex, p.xz * 0.0005);
+		return min(0.6, saturate(1 - atten * 20));
+	}
+
 	float4 rayTrace(float3 o, float3 dir, float len)
 	{
 				
@@ -273,7 +302,7 @@
 	fixed getShadowMap(float3 wpos)
 	{
 		float3 lightDir = _WorldSpaceLightPos0.xyz;
-		float atten = getAttenuation(wpos, lightDir, _shadowIteration);
+		float atten = getShadowAttenuation(wpos, lightDir, _shadowIteration);
 		return atten;
 	}
 
