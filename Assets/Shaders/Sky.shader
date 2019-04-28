@@ -1,4 +1,4 @@
-﻿// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
+// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
 
 Shader "Skybox/MZ" {
 Properties {
@@ -200,7 +200,7 @@ SubShader {
 
                 // Calculate the ray's starting position, then calculate its scattering offset
                 float height = kInnerRadius + kCameraHeight;
-                float depth = exp(kScaleOverScaleDepth * (-kCameraHeight)); //归一化后的光学厚度
+                float depth = exp(kScaleOverScaleDepth * (-kCameraHeight)); //归一化后的光学厚度 
                 float startAngle = dot(eyeRay, cameraPos) / height; //除以height用来给camerapos归一化
                 float startOffset = depth*scale(startAngle);//通过scale复原归一化，得到原始光学厚度
 
@@ -239,8 +239,6 @@ SubShader {
                     frontColor += attenuate * (depth * scaledLength);
                     samplePoint += sampleRay;
                 }
-
-
 
                 // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
                 cIn = frontColor * (kInvWavelength * kKrESun);
@@ -365,7 +363,7 @@ SubShader {
             col = LINEAR_2_OUTPUT(col);
         #endif
 
-            return half4(col,1.0);
+            return half4(col,0.0);
 
         }
         ENDCG

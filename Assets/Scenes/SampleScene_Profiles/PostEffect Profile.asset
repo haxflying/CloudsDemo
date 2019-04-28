@@ -16,6 +16,124 @@ MonoBehaviour:
   - {fileID: 114725239595109986}
   - {fileID: 114778712001625832}
   - {fileID: 114278342482880460}
+  - {fileID: 114195372683048120}
+--- !u!114 &114160606946988778
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GodRays
+  m_EditorClassIdentifier: Assembly-CSharp::GodRays
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugView:
+    overrideState: 0
+    value: 0
+  sun_density:
+    overrideState: 0
+    value: 8
+  light_density:
+    overrideState: 0
+    value: 2
+  downSample:
+    overrideState: 0
+    value: 4
+  MieG:
+    overrideState: 0
+    value: 0.6
+  ScaterringCoef:
+    overrideState: 0
+    value: 0.002
+  ExtinctionCoef:
+    overrideState: 0
+    value: 0.003
+  bilateralBlurDiffScale:
+    overrideState: 0
+    value: 20
+--- !u!114 &114195372683048120
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea0b22683e47dd41bd39eeacf4179e1, type: 3}
+  m_Name: VolumetricCloudEffect
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  debugClouds:
+    overrideState: 1
+    value: 0
+  useBlur:
+    overrideState: 1
+    value: 1
+  cloudIteration:
+    overrideState: 1
+    value: 90
+  bilateralBlurDiffScale:
+    overrideState: 1
+    value: 20
+  downScale:
+    overrideState: 1
+    value: 2
+  AmbientColor:
+    overrideState: 1
+    value: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
+  Absorption:
+    overrideState: 1
+    value: 0.025
+  atmosphereThickness:
+    overrideState: 1
+    value: 1.52
+  sun_density:
+    overrideState: 1
+    value: 10
+  blendFactor:
+    overrideState: 1
+    value: 1
+  coverage:
+    overrideState: 1
+    value: 0.9
+  textureDensity:
+    overrideState: 1
+    value: 1
+  speed:
+    overrideState: 1
+    value: 1.4
+  cloudStartHeight:
+    overrideState: 1
+    value: 1121
+  cloudThickness:
+    overrideState: 1
+    value: 2430
+  detail0:
+    overrideState: 1
+    value: {x: 1, y: 1, z: 1, w: 8.76}
+  detail1:
+    overrideState: 1
+    value: {x: 1, y: 1, z: 1, w: 8.1}
+  layerTex0:
+    overrideState: 1
+    value: {fileID: 2800000, guid: 44839d6bc1d9d04488f479053bd1eb8c, type: 3}
+    defaultState: 1
+  layerTex1:
+    overrideState: 1
+    value: {fileID: 2800000, guid: efd4b9b2b7d755a49bde6f56e05bec9e, type: 3}
+    defaultState: 1
+  noiseVolume:
+    overrideState: 1
+    value: {fileID: 11700000, guid: 2b9300a6c2cd4f94ab2130e260baf39b, type: 2}
+    defaultState: 1
 --- !u!114 &114278342482880460
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -27,7 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
@@ -1337,7 +1455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f6f3f7c722b4544b97e3c75840aa33, type: 3}
   m_Name: AutoExposure
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
@@ -1373,7 +1491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6050e2d5de785ce4d931e4dbdbf2d755, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1

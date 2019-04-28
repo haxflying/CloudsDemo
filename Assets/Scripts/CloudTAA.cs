@@ -6,9 +6,17 @@ using UnityEngine.Rendering;
 [ExecuteInEditMode]
 public class CloudTAA : MonoBehaviour {
 
-    public Material mat;
+    public Material cloudsMat, blurMat, lightMat;
+    public bool renderClouds = true;
+    public bool useBlur;
+    [Range(30, 150)]
+    public int cloudIteration = 90;
+    [Range(1f, 100f)]
+    public float bilateralBlurDiffScale = 20;
     [Range(1f, 4f)]
-    public float downSample = 1f;
+    public float downSample = 2f;
+
+
 
     public bool enableTimeLine = true;
 
@@ -19,7 +27,7 @@ public class CloudTAA : MonoBehaviour {
     public float blendFactor = 1f;
     [Range(0f, 1f)]
     public float textureDensity = 1;
-    
+
     static Mesh s_Quad;
     public static Mesh quad
     {
@@ -57,14 +65,21 @@ public class CloudTAA : MonoBehaviour {
 
             return s_Quad;
         }
-    }
+    } 
     //private RenderTexture prev_frame, buffer;
+
+    public enum debugMode
+    {
+        cloudsPass, TAAPass, BlurPass, CombinePass, None
+    }
 
     private CommandBuffer cb;
     private Camera cam;
     private int currentCamera;
     private int currentFrame;
     private int prev_frame;
+    private int cloudsFrame;
+    private int blurRes;
 
     private void OnEnable()
     {
@@ -78,22 +93,72 @@ public class CloudTAA : MonoBehaviour {
 
         cam.AddCommandBuffer(CameraEvent.BeforeForwardAlpha, cb);
 
+       
+    }
+
+    private void OnPreRender()
+    {
+        if (cb == null)
+            return;
+
+        cb.Clear();
+
+        if (!renderClouds)
+            return;
+
         int width = (int)((float)Screen.width / downSample);
-        int height = (int)((float)Screen.width / downSample);
-        currentCamera   = Shader.PropertyToID("_CameraRender");
-        currentFrame    = Shader.PropertyToID("_currentFrame");
-        prev_frame      = Shader.PropertyToID("_prev_frame");
-        cb.GetTemporaryRT(currentCamera, width, height);
-        cb.GetTemporaryRT(currentFrame , width, height);
-        cb.GetTemporaryRT(prev_frame   , width, height);
+        int height = (int)((float)Screen.height / downSample);
+
+        currentCamera = Shader.PropertyToID("_CameraRender");
+        currentFrame = Shader.PropertyToID("_currentFrame");
+        prev_frame = Shader.PropertyToID("_prev_frame");
+        cloudsFrame = Shader.PropertyToID("_clouds_frame");
+        blurRes = Shader.PropertyToID("_QuarterResColor");
+
+
+        cb.GetTemporaryRT(currentFrame, width, height);
+        cb.GetTemporaryRT(blurRes, width, height);
+
+        cb.GetTemporaryRT(cloudsFrame, Screen.width, Screen.height);
+        cb.GetTemporaryRT(currentCamera, Screen.width, Screen.height);
+        cb.GetTemporaryRT(prev_frame, Screen.width, Screen.height);
+
 
         cb.Blit(BuiltinRenderTextureType.CurrentActive, currentCamera);
 
         cb.SetRenderTarget(currentFrame);
-        cb.DrawMesh(quad, Matrix4x4.identity, mat, 0, 0);
+        cb.DrawMesh(quad, Matrix4x4.identity, cloudsMat, 0, 0); //draw clouds
+        //cb.Blit(null, currentFrame, cloudsMat, 0);
 
+        
+        if (useBlur)
+        {
+            cb.SetGlobalInt("_cloudIteration", cloudIteration);
+            cb.SetGlobalFloat("_BilateralBlurDiffScale", bilateralBlurDiffScale);
+
+            cb.SetRenderTarget(blurRes);
+            cb.DrawMesh(quad, Matrix4x4.identity, cloudsMat, 0, 1); //TAA
+
+            {
+                int temp_buffer = Shader.PropertyToID("temp_buffer");
+                cb.GetTemporaryRT(temp_buffer, width, height);
+
+                cb.Blit(blurRes, temp_buffer, blurMat, 8);
+                cb.Blit(temp_buffer, blurRes, blurMat, 9);
+
+                cb.Blit(blurRes, cloudsFrame, blurMat, 7);
+                cb.ReleaseTemporaryRT(temp_buffer);
+            }
+        }
+        else
+        {
+            cb.SetRenderTarget(cloudsFrame);
+            cb.DrawMesh(quad, Matrix4x4.identity, cloudsMat, 0, 1); //TAA     
+        }
+
+        //combine
         cb.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-        cb.DrawMesh(quad, Matrix4x4.identity, mat, 0, 1);
+        cb.DrawMesh(quad, Matrix4x4.identity, cloudsMat, 0, 2);
 
         cb.Blit(BuiltinRenderTextureType.CurrentActive, prev_frame);
         cb.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
@@ -114,26 +179,23 @@ public class CloudTAA : MonoBehaviour {
     {
         if (enableTimeLine)
         {
-            mat.SetFloat("_LayerBlend", blendFactor);
-            mat.SetFloat("_Coverage", coverage);
-            mat.SetFloat("_TextureDensity", textureDensity);
+            cloudsMat.SetFloat("_LayerBlend", blendFactor);
+            cloudsMat.SetFloat("_Coverage", coverage);
+            cloudsMat.SetFloat("_TextureDensity", textureDensity);
+        }
+
+        {
+            //lightMat.SetTexture("_LayerTex", cloudsMat.GetTexture("_LayerTex"));
+            //lightMat.SetTexture("_LayerTex1", cloudsMat.GetTexture("_LayerTex1"));
+            //lightMat.SetTexture("_NoiseVolume", cloudsMat.GetTexture("_NoiseVolume"));
+            //lightMat.SetFloat("_LayerBlend", cloudsMat.GetFloat("_LayerBlend"));
+            //lightMat.SetFloat("_CloudThickness", cloudsMat.GetFloat("_CloudThickness"));
+            //lightMat.SetFloat("_Coverage", cloudsMat.GetFloat("_Coverage"));
+            //lightMat.SetFloat("_Speed", cloudsMat.GetFloat("_Speed"));
+            //lightMat.SetFloat("_TextureDensity", cloudsMat.GetFloat("_TextureDensity"));
+            //lightMat.SetVector("_Detail0", cloudsMat.GetVector("_Detail0"));
+            //lightMat.SetVector("_Detail1", cloudsMat.GetVector("_Detail1"));
+
         }
     }
-
-
-    //[ImageEffectOpaque]
-    //private void OnRenderImage(RenderTexture src, RenderTexture dst)
-    //{
-    //    if (mat != null)
-    //    {
-    //        mat.SetTexture("_prev_frame", prev_frame);
-    //        Graphics.Blit(src, buffer, mat, 0);
-    //        Graphics.Blit(buffer, dst, mat, 1);
-    //        Graphics.Blit(dst, prev_frame);
-    //    }
-    //    else
-    //    {
-    //        Graphics.Blit(src, dst);
-    //    }
-    //}
 }
