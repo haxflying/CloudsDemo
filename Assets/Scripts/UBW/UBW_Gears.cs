@@ -25,7 +25,7 @@ public class UBW_Gears : MonoBehaviour {
         print("generate");
         for (int i = 0; i < nums; i++)
         {
-            int index = Mathf.FloorToInt(Random.Range(0, count - 1));
+            int index = Mathf.FloorToInt(Random.Range(0, count));
             Vector3 pos = new Vector3(Random.Range(bd.center.x - bd.size.x / 2f + padding, bd.center.x + bd.size.x / 2f - padding), 0,
                 Random.Range(bd.center.z - bd.size.z / 2f + padding, bd.center.z + bd.size.z / 2f - padding));
 

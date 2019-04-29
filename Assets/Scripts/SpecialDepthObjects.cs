@@ -16,6 +16,9 @@ public class SpecialDepthObjects : MonoBehaviour {
     private Material viewMat, depthWriterMat;
     private int specialDepth;
 
+    private List<List<Matrix4x4>> matrixes;
+    private Dictionary<Mesh, int> meshes;
+
     void Start () {
         cam = Camera.main;
 
@@ -33,9 +36,24 @@ public class SpecialDepthObjects : MonoBehaviour {
         depthWriterMat = new Material(writeDepthShader);
         depthWriterMat.enableInstancing = true;
         specialDepth = Shader.PropertyToID("_SpecialDepth");
-        
 
-	}
+        meshes = new Dictionary<Mesh, int>();
+        int index = 0;
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            var c = transform.GetChild(i);
+            var mesh = c.GetComponent<MeshFilter>().sharedMesh;
+            if (!meshes.ContainsKey(mesh))
+                meshes.Add(mesh, index++);
+        }
+
+        print("Gear Mesh Count " + meshes.Count);
+        matrixes = new List<List<Matrix4x4>>();
+        for (int i = 0; i < meshes.Count; i++)
+        {
+            matrixes.Add(new List<Matrix4x4>());
+        }
+    }
 
     private void Update()
     {
@@ -45,12 +63,23 @@ public class SpecialDepthObjects : MonoBehaviour {
             cb.GetTemporaryRT(specialDepth, cam.pixelWidth, cam.pixelHeight, 32, FilterMode.Bilinear, RenderTextureFormat.Depth);
             cb.SetRenderTarget(specialDepth);
             cb.ClearRenderTarget(true, true, Color.black);
-
+            
+            foreach(var list in matrixes)
+            {
+                list.Clear();
+            }
+            
             for (int i = 0; i < transform.childCount; i++)
             {
                 var c = transform.GetChild(i);
                 var mesh = c.GetComponent<MeshFilter>().sharedMesh;
-                cb.DrawMesh(mesh, c.localToWorldMatrix, depthWriterMat);
+                matrixes[meshes[mesh]].Add(c.localToWorldMatrix);
+                //cb.DrawMesh(mesh, c.localToWorldMatrix, depthWriterMat);
+            }
+
+            foreach(var mesh in meshes.Keys)
+            {
+                cb.DrawMeshInstanced(mesh, 0, depthWriterMat, 0, matrixes[meshes[mesh]].ToArray());
             }
 
             cb.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
